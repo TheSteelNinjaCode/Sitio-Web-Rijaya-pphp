@@ -12,13 +12,14 @@
   "websocket": false,
   "prisma": true,
   "docker": false,
-  "version": "1.15.30",
+  "version": "1.15.31",
   "excludeFiles": [
     ".env",
     "/prisma/schema.prisma",
     "/prisma/seed.js",
     "/src/app/index.php",
     "/src/app/layout.php",
-    "/src/app/metadata.php"
+    "/src/app/metadata.php",
+    "/src/app/css/index.css"
   ]
 }

@@ -22,21 +22,9 @@ abstract class Utility
         string $modelName,
         string $timestamp
     ) {
-        // echo 'checkFieldsExistWithReferences<pre>';
-        // print_r($select);
-        // print_r($relatedEntityFields);
-        // print_r($primaryEntityFields);
-        // print_r($relationName);
-        // print_r($fields);
-        // print_r($modelName);
-        // print_r($timestamp);
-        // echo '</pre>';
-
         if (isset($select) && is_array($select)) {
             foreach ($select as $key => $value) {
-                if ($key === $timestamp) {
-                    continue;
-                }
+                if ($key === $timestamp) continue;
 
                 if (is_numeric($key) && is_string($value)) {
                     if (array_key_exists($value, $fields))
