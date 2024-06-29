@@ -12,7 +12,7 @@
   "websocket": false,
   "prisma": true,
   "docker": false,
-  "version": "1.15.31",
+  "version": "1.15.32",
   "excludeFiles": [
     ".env",
     "/prisma/schema.prisma",
