@@ -39,12 +39,12 @@ class Product implements IModel
                 'isNullable' => '',
                 'isPrimaryKey' => '1',
                 'decorators' =>
-                array (
+                array(
                     'unique' => true,
                     'id' => true,
                     'default' => 'cuid',
-                  )
-                ),
+                )
+            ),
             'name' =>
             array(
                 'name' => 'name',
@@ -52,9 +52,8 @@ class Product implements IModel
                 'isNullable' => '',
                 'isPrimaryKey' => '',
                 'decorators' =>
-                array (
-                  )
-                ),
+                array()
+            ),
             'description' =>
             array(
                 'name' => 'description',
@@ -62,9 +61,8 @@ class Product implements IModel
                 'isNullable' => '1',
                 'isPrimaryKey' => '',
                 'decorators' =>
-                array (
-                  )
-                ),
+                array()
+            ),
             'price' =>
             array(
                 'name' => 'price',
@@ -72,9 +70,8 @@ class Product implements IModel
                 'isNullable' => '',
                 'isPrimaryKey' => '',
                 'decorators' =>
-                array (
-                  )
-                ),
+                array()
+            ),
             'createdAt' =>
             array(
                 'name' => 'createdAt',
@@ -82,10 +79,10 @@ class Product implements IModel
                 'isNullable' => '',
                 'isPrimaryKey' => '',
                 'decorators' =>
-                array (
+                array(
                     'default' => 'now',
-                  )
-                ),
+                )
+            ),
             'updatedAt' =>
             array(
                 'name' => 'updatedAt',
@@ -93,10 +90,10 @@ class Product implements IModel
                 'isNullable' => '',
                 'isPrimaryKey' => '',
                 'decorators' =>
-                array (
+                array(
                     'updatedAt' => true,
-                  )
-                ),
+                )
+            ),
             'categories' =>
             array(
                 'name' => 'categories',
@@ -104,28 +101,28 @@ class Product implements IModel
                 'isNullable' => '',
                 'isPrimaryKey' => '',
                 'decorators' =>
-                array (
-                    'inverseRelation' => 
-                    array (
-                      'fromModel' => 'Product',
-                      'fromModelTableName' => 'Product',
-                      'fromField' => 'categories',
-                      'toModel' => 'Category',
-                      'toField' => 'Product',
-                      'type' => 'OneToMany',
-                      'fields' => 
-                      array (
-                        0 => 'id',
-                      ),
-                      'references' => 
-                      array (
-                        0 => 'id',
-                      ),
-                      'tableName' => 'Category',
-                      'tablePrimaryKey' => 'id',
+                array(
+                    'inverseRelation' =>
+                    array(
+                        'fromModel' => 'Product',
+                        'fromModelTableName' => 'Product',
+                        'fromField' => 'categories',
+                        'toModel' => 'Category',
+                        'toField' => 'Product',
+                        'type' => 'OneToMany',
+                        'fields' =>
+                        array(
+                            0 => 'id',
+                        ),
+                        'references' =>
+                        array(
+                            0 => 'id',
+                        ),
+                        'tableName' => 'Category',
+                        'tablePrimaryKey' => 'id',
                     ),
-                  )
-                ),
+                )
+            ),
             'ProductCategory' =>
             array(
                 'name' => 'ProductCategory',
@@ -133,28 +130,28 @@ class Product implements IModel
                 'isNullable' => '',
                 'isPrimaryKey' => '',
                 'decorators' =>
-                array (
-                    'inverseRelation' => 
-                    array (
-                      'fromModel' => 'Product',
-                      'fromModelTableName' => 'Product',
-                      'fromField' => 'ProductCategory',
-                      'toModel' => 'ProductCategory',
-                      'toField' => 'product',
-                      'type' => 'OneToMany',
-                      'fields' => 
-                      array (
-                        0 => 'productId',
-                      ),
-                      'references' => 
-                      array (
-                        0 => 'id',
-                      ),
-                      'tableName' => 'product',
-                      'tablePrimaryKey' => 'productId',
+                array(
+                    'inverseRelation' =>
+                    array(
+                        'fromModel' => 'Product',
+                        'fromModelTableName' => 'Product',
+                        'fromField' => 'ProductCategory',
+                        'toModel' => 'ProductCategory',
+                        'toField' => 'product',
+                        'type' => 'OneToMany',
+                        'fields' =>
+                        array(
+                            0 => 'productId',
+                        ),
+                        'references' =>
+                        array(
+                            0 => 'id',
+                        ),
+                        'tableName' => 'product',
+                        'tablePrimaryKey' => 'productId',
                     ),
-                  )
-                ),
+                )
+            ),
             'ProductImage' =>
             array(
                 'name' => 'ProductImage',
@@ -162,29 +159,29 @@ class Product implements IModel
                 'isNullable' => '',
                 'isPrimaryKey' => '',
                 'decorators' =>
-                array (
-                    'inverseRelation' => 
-                    array (
-                      'fromModel' => 'Product',
-                      'fromModelTableName' => 'Product',
-                      'fromField' => 'ProductImage',
-                      'toModel' => 'ProductImage',
-                      'toField' => 'product',
-                      'type' => 'OneToMany',
-                      'fields' => 
-                      array (
-                        0 => 'productId',
-                      ),
-                      'references' => 
-                      array (
-                        0 => 'id',
-                      ),
-                      'tableName' => 'product',
-                      'tablePrimaryKey' => 'id',
+                array(
+                    'inverseRelation' =>
+                    array(
+                        'fromModel' => 'Product',
+                        'fromModelTableName' => 'Product',
+                        'fromField' => 'ProductImage',
+                        'toModel' => 'ProductImage',
+                        'toField' => 'product',
+                        'type' => 'OneToMany',
+                        'fields' =>
+                        array(
+                            0 => 'productId',
+                        ),
+                        'references' =>
+                        array(
+                            0 => 'id',
+                        ),
+                        'tableName' => 'product',
+                        'tablePrimaryKey' => 'id',
                     ),
-                  )
-                ),
-            );
+                )
+            ),
+        );
 
         $this->_modelName = 'Product';
         $this->_fieldsOnly = ['id', 'name', 'description', 'price', 'createdAt', 'updatedAt'];
@@ -285,7 +282,7 @@ class Product implements IModel
         $this->updatedAt = $validatedValue;
     }
 
-    protected function includeCategories(array $items, array $selectedFields = [], array $includeSelectedFields = [], bool $format = false) 
+    protected function includeCategories(array $items, array $selectedFields = [], array $includeSelectedFields = [], bool $format = false)
     {
         if (empty($items)) {
             return $items;
@@ -360,7 +357,7 @@ class Product implements IModel
                 throw new \Exception("Error connecting $modelName: createMany is only supported for OneToMany relations");
             }
 
-            $dataToUpdate = array_map(function($data) use ($relatedForeignKey, $lastInsertId) {
+            $dataToUpdate = array_map(function ($data) use ($relatedForeignKey, $lastInsertId) {
                 $data[$relatedForeignKey] = $lastInsertId;
                 return $data;
             }, $connectData);
@@ -414,7 +411,7 @@ class Product implements IModel
             }
         }
     }
-    protected function includeProductCategory(array $items, array $selectedFields = [], array $includeSelectedFields = [], bool $format = false) 
+    protected function includeProductCategory(array $items, array $selectedFields = [], array $includeSelectedFields = [], bool $format = false)
     {
         if (empty($items)) {
             return $items;
@@ -489,7 +486,7 @@ class Product implements IModel
                 throw new \Exception("Error connecting $modelName: createMany is only supported for OneToMany relations");
             }
 
-            $dataToUpdate = array_map(function($data) use ($relatedForeignKey, $lastInsertId) {
+            $dataToUpdate = array_map(function ($data) use ($relatedForeignKey, $lastInsertId) {
                 $data[$relatedForeignKey] = $lastInsertId;
                 return $data;
             }, $connectData);
@@ -543,7 +540,7 @@ class Product implements IModel
             }
         }
     }
-    protected function includeProductImage(array $items, array $selectedFields = [], array $includeSelectedFields = [], bool $format = false) 
+    protected function includeProductImage(array $items, array $selectedFields = [], array $includeSelectedFields = [], bool $format = false)
     {
         if (empty($items)) {
             return $items;
@@ -618,7 +615,7 @@ class Product implements IModel
                 throw new \Exception("Error connecting $modelName: createMany is only supported for OneToMany relations");
             }
 
-            $dataToUpdate = array_map(function($data) use ($relatedForeignKey, $lastInsertId) {
+            $dataToUpdate = array_map(function ($data) use ($relatedForeignKey, $lastInsertId) {
                 $data[$relatedForeignKey] = $lastInsertId;
                 return $data;
             }, $connectData);
@@ -672,7 +669,7 @@ class Product implements IModel
             }
         }
     }
-    
+
     /**
      * Creates a new User in the database.
      *
@@ -731,7 +728,7 @@ class Product implements IModel
      * - Transaction management is utilized to ensure that all database operations are executed
      *   atomically, rolling back changes in case of any error, thus maintaining data consistency.
      */
-    public function create(array $data, bool $format = false): array | object 
+    public function create(array $data, bool $format = false): array | object
     {
         if (!isset($data['data'])) {
             throw new \Exception("The 'data' key is required when creating a new Product.");
@@ -758,7 +755,7 @@ class Product implements IModel
                 throw new \Exception("The '$fieldName' field of type '$fieldType' is required when creating a new Product.");
             }
         }
-        
+
         $select = $data['select'] ?? [];
         $include = $data['include'] ?? [];
         $data = $data['data'];
@@ -893,31 +890,31 @@ class Product implements IModel
                         if (isset($relationDataName['connect']) && isset($relationDataName['connectOrCreate'])) {
                             throw new \Exception("You can't use both 'connect' and 'connectOrCreate' at the same time.");
                         }
-    
+
                         if (isset($relationDataName['connect']) && isset($relationDataName['disconnect'])) {
                             throw new \Exception("You can't use both 'connect' and 'disconnect' at the same time.");
                         }
 
                         if (isset($relationDataName['connect']) || isset($relationDataName['connectOrCreate'])) {
-    
+
                             if (isset($relationDataName['connect'])) {
                                 $connectData = $relationDataName['connect'];
                                 $checkArrayContentType = Utility::checkArrayContents($connectData);
-    
+
                                 if (isset($relationDataName['connect']) && $checkArrayContentType !== ArrayType::Value) {
                                     throw new \Exception("The 'connect' key must be an associative array with the field names as keys and the data to create as values related '$relationName' model. example: ['connect' => ['id' => 'someId']]");
                                 }
                             }
-    
+
                             if (isset($relationDataName['connectOrCreate'])) {
                                 $connectOrCreateData = $relationDataName['connectOrCreate'];
                                 $checkArrayContentType = Utility::checkArrayContents($connectOrCreateData);
-    
+
                                 if (isset($relationDataName['connectOrCreate']) && $checkArrayContentType !== ArrayType::Associative) {
                                     throw new \Exception("The 'connectOrCreate' key must be an associative array with the field names as keys and the data to create as values related '$relationName' model. example: ['connectOrCreate' => ['where' => ['id' => 'someId'], 'create' => ['name' => 'someName']]");
                                 }
                             }
-    
+
                             if (isset($relationDataName['disconnect'])) {
                                 throw new \Exception("The 'disconnect' key is not allowed in the create method.");
                             }
@@ -1044,7 +1041,7 @@ class Product implements IModel
                 $isNullable = $field['isNullable'];
                 $relation = $field['decorators']['relation'] ?? null;
                 $inverseRelation = $field['decorators']['inverseRelation'] ?? null;
-    
+
                 if (!empty($field['decorators']['id'])) {
                     if (empty($item[$fieldName])) {
                         if ($field['decorators']['default'] === 'uuid') {
@@ -1070,7 +1067,7 @@ class Product implements IModel
                     }
                     $placeholders[] = "NULL";
                 }
-    
+
                 if (array_key_exists($fieldName, $item)) {
                     if (isset($relation) || isset($inverseRelation)) continue;
                     $placeholders[] = ":{$fieldName}_{$index}";
@@ -1081,7 +1078,7 @@ class Product implements IModel
                     }
                 }
             }
-    
+
             $allPlaceholders[] = '(' . implode(', ', $placeholders) . ')';
             $index++;
         }
@@ -1208,7 +1205,7 @@ class Product implements IModel
         $sql = "SELECT $selectFields FROM $quotedTableName WHERE ";
         $conditions = [];
         $bindings = [];
-        
+
         if (isset($where['id'])) {
             $conditions[] = "id = :id";
             $validatedValue = Validator::string($where['id']);
@@ -1307,6 +1304,10 @@ class Product implements IModel
      */
     public function findMany(array $criteria = [], bool $format = false): array | object
     {
+        echo 'Product function findMany<pre>';
+        print_r($criteria);
+        echo '</pre>';
+
         if (isset($criteria['where'])) {
             if (!is_array($criteria['where']) || empty($criteria['where']))
                 throw new \Exception("No valid 'where' provided for finding multiple records.");
@@ -1411,7 +1412,7 @@ class Product implements IModel
                 } else {
                     $selectedFields = $relatedField;
                 }
-                
+
                 $includeMethodName = "include" . ucfirst($relation);
                 if (method_exists($this, $includeMethodName)) {
                     $items = $this->$includeMethodName($items, $select, $selectedFields, $format);
@@ -1535,7 +1536,7 @@ class Product implements IModel
             }, $primaryEntityFields);
             $selectFields = implode(', ', $formattedFields);
         }
-        
+
         $sql = "SELECT $distinct $selectFields FROM $quotedTableName";
         $conditions = [];
         $bindings = [];
@@ -1578,7 +1579,7 @@ class Product implements IModel
         if (!$record) {
             return [];
         }
-        
+
         foreach ($relatedEntityFields as $relation => $fields) {
             if (!isset($includes[$relation])) {
                 $includes[$relation] = true; // Implicitly include this relation
@@ -1593,7 +1594,7 @@ class Product implements IModel
                 } else {
                     $selectedFields = $relatedField;
                 }
-                
+
                 $includeMethodName = "include" . ucfirst($relation);
                 if (method_exists($this, $includeMethodName)) {
                     $record = $this->$includeMethodName($record, $select, $selectedFields, $format);
@@ -1710,7 +1711,7 @@ class Product implements IModel
         $sql = "UPDATE $quotedTableName SET ";
         $updateFields = [];
         $bindings = [];
-        $primaryKeyField = '';    
+        $primaryKeyField = '';
 
         Utility::checkFieldsExist(array_merge($data, $select, $include), $this->_fields, $this->_modelName);
 
@@ -1739,7 +1740,7 @@ class Product implements IModel
                     }
                 }
             }
-            
+
             if (!empty($updateFields)) {
                 $sql .= implode(', ', $updateFields);
 
@@ -2214,13 +2215,13 @@ class Product implements IModel
      * @return array An array of results with grouped data.
      * @throws \Exception Throws an exception if the database operation fails.
      */
-    public function groupBy(array $criteria, bool $format = false): array | object 
+    public function groupBy(array $criteria, bool $format = false): array | object
     {
         $aggregates = $criteria['aggregates'] ?? [];
         $dbType = $this->_pdo->getAttribute(\PDO::ATTR_DRIVER_NAME);
         $quotedTableName = $dbType == 'pgsql' ? "\"Product\"" : "`Product`";
         $groupByFields = implode(', ', $criteria);
-        $aggregateFields = array_map(fn($a) => "{$a['function']}({$a['field']}) AS {$a['alias']}", $aggregates);
+        $aggregateFields = array_map(fn ($a) => "{$a['function']}({$a['field']}) AS {$a['alias']}", $aggregates);
         $sql = "SELECT $groupByFields, " . implode(', ', $aggregateFields) . " FROM $quotedTableName GROUP BY $groupByFields";
 
         $stmt = $this->_pdo->prepare($sql);
@@ -2400,7 +2401,7 @@ class Product implements IModel
 ";
      * echo "Number of affected rows: " . $result['affectedRows'];
      */
-    public function deleteMany(array $criteria, bool $format = false): array | object 
+    public function deleteMany(array $criteria, bool $format = false): array | object
     {
         if (!isset($criteria['where'])) {
             throw new \Exception("The 'where' key is required in the deleteMany User.");
@@ -2476,7 +2477,7 @@ class Product implements IModel
         $select = $criteria['select'] ?? [];
         $dbType = $this->_dbType;
         $quotedTableName = $dbType === 'pgsql' ? "\"Product\"" : "`Product`";
-        
+
         $selectedFields = 'COUNT(*)';
         if (!empty($select)) {
             $selectedFields = '';

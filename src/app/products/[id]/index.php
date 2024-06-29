@@ -17,6 +17,7 @@ if (!empty($id)) {
     ], true);
 
     if ($product) {
+        echo '=====================relatedProducts<br>';
         $relatedProducts = $prisma->productCategory->findMany([
             'where' => [
                 'categoryId' => $product->ProductCategory[0]->categoryId,
@@ -25,13 +26,15 @@ if (!empty($id)) {
                 ]
             ],
             'include' => ['product' => [
-                'select' => ['ProductImage' => true]
+                'select' => [
+                    'ProductImage' => true
+                ]
             ]]
         ], true);
 
-        // echo '<pre>';
-        // print_r($relatedProducts);
-        // echo '</pre>';
+        echo '<pre>';
+        print_r($relatedProducts);
+        echo '</pre>';
     } else {
         echo "Producto no encontrado";
         exit;

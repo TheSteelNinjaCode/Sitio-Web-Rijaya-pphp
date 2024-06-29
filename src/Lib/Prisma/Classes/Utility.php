@@ -185,15 +185,16 @@ abstract class Utility
 
     private static function processIncludeValue($key, $value, &$relatedEntityFields, $fields, $modelName, $parentKey)
     {
-        // echo "key: $key<br>";
-        // echo "value: " . json_encode($value) . "<br>";
+        echo "key: $key<br>";
+        echo "value: " . json_encode($value) . "<br>";
         // // echo "relatedEntityFields: " . json_encode($relatedEntityFields) . "<br>";
         // // echo "fields: " . json_encode($fields) . "<br>";
-        // echo "modelName: $modelName<br>";
-        // echo "parentKey: $parentKey<br>";
+        echo "modelName: $modelName<br>";
+        echo "parentKey: $parentKey<br>";
 
         if (isset($value['select'])) {
-            $relatedEntityFields[$parentKey] = $value['select'];
+            echo "value: " . json_encode($value) . "<br>";
+            $relatedEntityFields[$parentKey] = $value;
         } elseif (is_array($value)) {
             if (empty($value)) {
                 $relatedEntityFields[$parentKey] = [$parentKey];
@@ -202,7 +203,9 @@ abstract class Utility
                     // echo "k: $k<br>";
                     // echo "v: " . json_encode($v) . "<br>";
                     if (is_string($k) && (is_bool($v) || empty($v))) {
-                        $relatedEntityFields[$parentKey] = $k;
+                        echo "k: $k<br>";
+                        echo "v: " . json_encode($v) . "<br>";
+                        $relatedEntityFields[$parentKey]['include'] = [$k => $v];
                     } else {
                         self::processIncludeValue($k, $v, $relatedEntityFields, $fields, $modelName, $parentKey);
                     }

@@ -19,10 +19,6 @@
 
 <body>
     <!-- Additional HTML content can go here. -->
-    <?php if ($dynamicRouteParams) {
-        echo "Hello Baby";
-    }
-    ?>
     <?php echo $content; ?>
     <?php require_once APP_PATH . '/_components/footer.php'; ?>
     <!-- Additional HTML content can go here. -->
