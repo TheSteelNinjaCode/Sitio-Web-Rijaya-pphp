@@ -6,7 +6,8 @@ use Lib\StateManager;
 $prisma = new Prisma();
 $state = new StateManager();
 
-$page = $state->getState('page', 1);
+$page = $params->page ?? 1;
+// $page = $state->getState('page', 1);
 $perPage = 4;
 
 $products = $prisma->product->findMany([
@@ -62,8 +63,10 @@ function paginate($data)
 
     <div class="page-btn">
         <?php for ($i = 1; $i <= $totalPages; $i++) : ?>
-            <span onclick="paginate({'page': '<?= $i ?>'})"><?= $i ?></span>
+            <a href="<?= $pathname . '?page=' . $i ?>"><span><?= $i ?></span></a>
+            <!-- <span onclick="paginate({'page': '<?= $i ?>'})"><?= $i ?></span> -->
         <?php endfor; ?>
-        <span onclick="paginate({'page': '<?= $totalPages ?>'})">&#8594;</span>
+        <span href="<?= $pathname . '?page=' . $totalPages ?>">&#8594;</span>
+        <!-- <span onclick="paginate({'page': '<?= $totalPages ?>'})">&#8594;</span> -->
     </div>
 </div>
