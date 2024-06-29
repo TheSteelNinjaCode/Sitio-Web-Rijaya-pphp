@@ -4,8 +4,6 @@ namespace Lib\Prisma\Classes;
 
 use Lib\Validator;
 
-use function PHPSTORM_META\type;
-
 enum ArrayType: string
 {
     case Associative = 'associative';
@@ -67,7 +65,9 @@ abstract class Utility
                         $fieldName = trim($fieldName);
 
                         if (!array_key_exists($fieldName, $fields)) {
-                            throw new \Exception("The field '$fieldName' does not exist in the $modelName model.");
+                            // Additional debug information
+                            $availableFields = implode(', ', array_keys($fields));
+                            throw new \Exception("The field '$fieldName' does not exist in the $modelName model. Available fields are: $availableFields");
                         }
 
                         if (
@@ -185,26 +185,14 @@ abstract class Utility
 
     private static function processIncludeValue($key, $value, &$relatedEntityFields, $fields, $modelName, $parentKey)
     {
-        echo "key: $key<br>";
-        echo "value: " . json_encode($value) . "<br>";
-        // // echo "relatedEntityFields: " . json_encode($relatedEntityFields) . "<br>";
-        // // echo "fields: " . json_encode($fields) . "<br>";
-        echo "modelName: $modelName<br>";
-        echo "parentKey: $parentKey<br>";
-
         if (isset($value['select'])) {
-            echo "value: " . json_encode($value) . "<br>";
             $relatedEntityFields[$parentKey] = $value;
         } elseif (is_array($value)) {
             if (empty($value)) {
                 $relatedEntityFields[$parentKey] = [$parentKey];
             } else {
                 foreach ($value as $k => $v) {
-                    // echo "k: $k<br>";
-                    // echo "v: " . json_encode($v) . "<br>";
                     if (is_string($k) && (is_bool($v) || empty($v))) {
-                        echo "k: $k<br>";
-                        echo "v: " . json_encode($v) . "<br>";
                         $relatedEntityFields[$parentKey]['include'] = [$k => $v];
                     } else {
                         self::processIncludeValue($k, $v, $relatedEntityFields, $fields, $modelName, $parentKey);

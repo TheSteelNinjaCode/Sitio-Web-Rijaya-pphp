@@ -151,13 +151,12 @@ class UserRole implements IModel
         $foreignKeyIds = array_unique($foreignKeyIds);
 
         $modelName = new User($this->_pdo);
-        $isSelectOrInclude = !empty($selectedFields) ? 'select' : 'include';
         foreach ($items as &$item) {
             if (!isset($item[$primaryKey])) {
                 $item[$relationName] = [];
                 continue;
             }
-            $relatedRecords = $modelName->findMany(['where' => [$foreignKey => $item[$primaryKey]], $isSelectOrInclude => $includeSelectedFields], $format);
+            $relatedRecords = $modelName->findMany(['where' => [$foreignKey => $item[$primaryKey]], 'select' => $includeSelectedFields], $format);
             $item[$relationName] = $relatedRecords;
         }
 

@@ -17,7 +17,6 @@ if (!empty($id)) {
     ], true);
 
     if ($product) {
-        echo '=====================relatedProducts<br>';
         $relatedProducts = $prisma->productCategory->findMany([
             'where' => [
                 'categoryId' => $product->ProductCategory[0]->categoryId,
@@ -26,15 +25,11 @@ if (!empty($id)) {
                 ]
             ],
             'include' => ['product' => [
-                'select' => [
+                'include' => [
                     'ProductImage' => true
                 ]
             ]]
         ], true);
-
-        echo '<pre>';
-        print_r($relatedProducts);
-        echo '</pre>';
     } else {
         echo "Producto no encontrado";
         exit;
@@ -43,6 +38,14 @@ if (!empty($id)) {
     echo "Producto no encontrado";
     exit;
 }
+
+function addToCart($product)
+{
+    $cart = $_SESSION['cart'] ?? [];
+    $cart[] = $product;
+    $_SESSION['cart'] = $cart;
+}
+
 ?>
 
 <?php require_once APP_PATH . '/_components/navbar.php'; ?>

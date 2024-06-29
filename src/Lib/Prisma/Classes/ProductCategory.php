@@ -34,13 +34,13 @@ class ProductCategory implements IModel
                 'isNullable' => '',
                 'isPrimaryKey' => '1',
                 'decorators' =>
-                array(
+                array (
                     'id' => true,
                     'unique' => true,
                     'default' => 'String',
                     'composite' => true,
-                )
-            ),
+                  )
+                ),
             'categoryId' =>
             array(
                 'name' => 'categoryId',
@@ -48,13 +48,13 @@ class ProductCategory implements IModel
                 'isNullable' => '',
                 'isPrimaryKey' => '1',
                 'decorators' =>
-                array(
+                array (
                     'id' => true,
                     'unique' => true,
                     'default' => 'String',
                     'composite' => true,
-                )
-            ),
+                  )
+                ),
             'product' =>
             array(
                 'name' => 'product',
@@ -62,29 +62,29 @@ class ProductCategory implements IModel
                 'isNullable' => '',
                 'isPrimaryKey' => '',
                 'decorators' =>
-                array(
-                    'relation' =>
-                    array(
-                        'name' => 'product',
-                        'model' => 'Product',
-                        'relationModelName' => 'Product',
-                        'fields' =>
-                        array(
-                            0 => 'productId',
-                        ),
-                        'references' =>
-                        array(
-                            0 => 'id',
-                        ),
-                        'onDelete' => 'SetNull',
-                        'onUpdate' => 'Cascade',
-                        'type' => 'OneToMany',
-                        'tableName' => 'ProductCategory',
-                        'tableModelName' => 'ProductCategory',
-                        'tablePrimaryKey' => 'id',
+                array (
+                    'relation' => 
+                    array (
+                      'name' => 'product',
+                      'model' => 'Product',
+                      'relationModelName' => 'Product',
+                      'fields' => 
+                      array (
+                        0 => 'productId',
+                      ),
+                      'references' => 
+                      array (
+                        0 => 'id',
+                      ),
+                      'onDelete' => 'SetNull',
+                      'onUpdate' => 'Cascade',
+                      'type' => 'OneToMany',
+                      'tableName' => 'ProductCategory',
+                      'tableModelName' => 'ProductCategory',
+                      'tablePrimaryKey' => 'id',
                     ),
-                )
-            ),
+                  )
+                ),
             'category' =>
             array(
                 'name' => 'category',
@@ -92,30 +92,30 @@ class ProductCategory implements IModel
                 'isNullable' => '',
                 'isPrimaryKey' => '',
                 'decorators' =>
-                array(
-                    'relation' =>
-                    array(
-                        'name' => 'category',
-                        'model' => 'Category',
-                        'relationModelName' => 'Category',
-                        'fields' =>
-                        array(
-                            0 => 'categoryId',
-                        ),
-                        'references' =>
-                        array(
-                            0 => 'id',
-                        ),
-                        'onDelete' => 'SetNull',
-                        'onUpdate' => 'Cascade',
-                        'type' => 'OneToMany',
-                        'tableName' => 'ProductCategory',
-                        'tableModelName' => 'ProductCategory',
-                        'tablePrimaryKey' => 'id',
+                array (
+                    'relation' => 
+                    array (
+                      'name' => 'category',
+                      'model' => 'Category',
+                      'relationModelName' => 'Category',
+                      'fields' => 
+                      array (
+                        0 => 'categoryId',
+                      ),
+                      'references' => 
+                      array (
+                        0 => 'id',
+                      ),
+                      'onDelete' => 'SetNull',
+                      'onUpdate' => 'Cascade',
+                      'type' => 'OneToMany',
+                      'tableName' => 'ProductCategory',
+                      'tableModelName' => 'ProductCategory',
+                      'tablePrimaryKey' => 'id',
                     ),
-                )
-            ),
-        );
+                  )
+                ),
+            );
 
         $this->_modelName = 'ProductCategory';
         $this->_fieldsOnly = ['productId', 'categoryId'];
@@ -162,13 +162,8 @@ class ProductCategory implements IModel
         $this->categoryId = $validatedValue;
     }
 
-    protected function includeProduct(array $items, array $selectedFields = [], array $includeSelectedFields = [], bool $format = false)
+    protected function includeProduct(array $items, array $selectedFields = [], array $includeSelectedFields = [], bool $format = false) 
     {
-        echo 'function includeProduct <pre>';
-        print_r($selectedFields);
-        print_r($includeSelectedFields);
-        echo '</pre>';
-
         if (empty($items)) {
             return $items;
         }
@@ -198,7 +193,6 @@ class ProductCategory implements IModel
         $wasEmpty = false;
 
         if (empty($foreignKeyIds)) {
-            echo "==============if empty";
             $itemsIds = array_column($items, $tablePrimaryKey);
             $placeholders = implode(', ', array_fill(0, count($itemsIds), '?'));
             $relatedModelSql = "SELECT $foreignKeyQuoted FROM $tableName WHERE $tablePrimaryKeyQuoted IN ($placeholders)";
@@ -219,7 +213,6 @@ class ProductCategory implements IModel
         }
 
         if (!empty($foreignKeyIds)) {
-            echo "==============if !empty<br>";
             $tableModelName = new Product($this->_pdo);
             $isSelectOrInclude = !empty($selectedFields) ? 'select' : 'include';
             $selectOrIncludeValues = $isSelectOrInclude === 'select' ? $selectedFields : $includeSelectedFields;
@@ -230,10 +223,8 @@ class ProductCategory implements IModel
                     continue;
                 }
 
-                // Prepare the where condition
                 $queryParams = ['where' => [$primaryKey => $item[$foreignKey]]];
 
-                // Merge the select or include values into the query parameters
                 foreach ($selectOrIncludeValues as $key => $value) {
                     if (is_int($key)) {
                         $queryParams = array_merge($queryParams, $value);
@@ -242,7 +233,6 @@ class ProductCategory implements IModel
                     }
                 }
 
-                // Find related records using the merged query parameters
                 $relatedRecords = $tableModelName->findMany($queryParams, $format);
                 $item[$relationName] = $relatedRecords;
 
@@ -350,7 +340,7 @@ class ProductCategory implements IModel
         }
     }
 
-    protected function includeCategory(array $items, array $selectedFields = [], array $includeSelectedFields = [], bool $format = false)
+    protected function includeCategory(array $items, array $selectedFields = [], array $includeSelectedFields = [], bool $format = false) 
     {
         if (empty($items)) {
             return $items;
@@ -403,12 +393,25 @@ class ProductCategory implements IModel
         if (!empty($foreignKeyIds)) {
             $tableModelName = new Category($this->_pdo);
             $isSelectOrInclude = !empty($selectedFields) ? 'select' : 'include';
+            $selectOrIncludeValues = $isSelectOrInclude === 'select' ? $selectedFields : $includeSelectedFields;
+
             foreach ($items as &$item) {
                 if (!isset($item[$foreignKey])) {
                     $item[$relationName] = [];
                     continue;
                 }
-                $relatedRecords = $tableModelName->findMany(['where' => [$primaryKey => $item[$foreignKey]], $isSelectOrInclude => $includeSelectedFields], $format);
+
+                $queryParams = ['where' => [$primaryKey => $item[$foreignKey]]];
+
+                foreach ($selectOrIncludeValues as $key => $value) {
+                    if (is_int($key)) {
+                        $queryParams = array_merge($queryParams, $value);
+                    } else {
+                        $queryParams[$key] = $value;
+                    }
+                }
+
+                $relatedRecords = $tableModelName->findMany($queryParams, $format);
                 $item[$relationName] = $relatedRecords;
 
                 if ($wasEmpty && isset($item[$foreignKey])) {
@@ -515,7 +518,7 @@ class ProductCategory implements IModel
         }
     }
 
-
+    
     /**
      * Creates a new User in the database.
      *
@@ -574,7 +577,7 @@ class ProductCategory implements IModel
      * - Transaction management is utilized to ensure that all database operations are executed
      *   atomically, rolling back changes in case of any error, thus maintaining data consistency.
      */
-    public function create(array $data, bool $format = false): array | object
+    public function create(array $data, bool $format = false): array | object 
     {
         if (!isset($data['data'])) {
             throw new \Exception("The 'data' key is required when creating a new ProductCategory.");
@@ -589,7 +592,7 @@ class ProductCategory implements IModel
         }
 
         $acceptedCriteria = ['data', 'select', 'include'];
-        Utility::checkForInvalidKeys($data, $acceptedCriteria, $this->_modelName);
+        Utility::checkForInvalidKeys($data, $acceptedCriteria, $this->_modelName);        
         $select = $data['select'] ?? [];
         $include = $data['include'] ?? [];
         $data = $data['data'];
@@ -724,31 +727,31 @@ class ProductCategory implements IModel
                         if (isset($relationDataName['connect']) && isset($relationDataName['connectOrCreate'])) {
                             throw new \Exception("You can't use both 'connect' and 'connectOrCreate' at the same time.");
                         }
-
+    
                         if (isset($relationDataName['connect']) && isset($relationDataName['disconnect'])) {
                             throw new \Exception("You can't use both 'connect' and 'disconnect' at the same time.");
                         }
 
                         if (isset($relationDataName['connect']) || isset($relationDataName['connectOrCreate'])) {
-
+    
                             if (isset($relationDataName['connect'])) {
                                 $connectData = $relationDataName['connect'];
                                 $checkArrayContentType = Utility::checkArrayContents($connectData);
-
+    
                                 if (isset($relationDataName['connect']) && $checkArrayContentType !== ArrayType::Value) {
                                     throw new \Exception("The 'connect' key must be an associative array with the field names as keys and the data to create as values related '$relationName' model. example: ['connect' => ['id' => 'someId']]");
                                 }
                             }
-
+    
                             if (isset($relationDataName['connectOrCreate'])) {
                                 $connectOrCreateData = $relationDataName['connectOrCreate'];
                                 $checkArrayContentType = Utility::checkArrayContents($connectOrCreateData);
-
+    
                                 if (isset($relationDataName['connectOrCreate']) && $checkArrayContentType !== ArrayType::Associative) {
                                     throw new \Exception("The 'connectOrCreate' key must be an associative array with the field names as keys and the data to create as values related '$relationName' model. example: ['connectOrCreate' => ['where' => ['id' => 'someId'], 'create' => ['name' => 'someName']]");
                                 }
                             }
-
+    
                             if (isset($relationDataName['disconnect'])) {
                                 throw new \Exception("The 'disconnect' key is not allowed in the create method.");
                             }
@@ -859,7 +862,7 @@ class ProductCategory implements IModel
                 $isNullable = $field['isNullable'];
                 $relation = $field['decorators']['relation'] ?? null;
                 $inverseRelation = $field['decorators']['inverseRelation'] ?? null;
-
+    
                 if (!empty($field['decorators']['id'])) {
                     if (empty($item[$fieldName])) {
                         if ($field['decorators']['default'] === 'uuid') {
@@ -885,7 +888,7 @@ class ProductCategory implements IModel
                     }
                     $placeholders[] = "NULL";
                 }
-
+    
                 if (array_key_exists($fieldName, $item)) {
                     if (isset($relation) || isset($inverseRelation)) continue;
                     $placeholders[] = ":{$fieldName}_{$index}";
@@ -896,7 +899,7 @@ class ProductCategory implements IModel
                     }
                 }
             }
-
+    
             $allPlaceholders[] = '(' . implode(', ', $placeholders) . ')';
             $index++;
         }
@@ -1023,7 +1026,7 @@ class ProductCategory implements IModel
         $sql = "SELECT $selectFields FROM $quotedTableName WHERE ";
         $conditions = [];
         $bindings = [];
-
+        
         if (isset($where['productId'])) {
             $conditions[] = "productId = :productId";
             $validatedValue = Validator::string($where['productId']);
@@ -1165,17 +1168,8 @@ class ProductCategory implements IModel
             }
         }
 
-        echo 'before function findMany relatedEntityFields <pre>';
-        print_r($relatedEntityFields);
-        print_r($include);
-        echo '</pre>';
         Utility::checkIncludes($include, $relatedEntityFields, $includes, $this->_fields, $this->_modelName);
         Utility::checkFieldsExistWithReferences($select, $relatedEntityFields, $primaryEntityFields, $relationNames, $this->_fields, $this->_modelName, $timestamp);
-
-        echo 'after function findMany relatedEntityFields <pre>';
-        print_r($relatedEntityFields);
-        print_r($include);
-        echo '</pre>';
 
         $selectFields = '*'; // Default to all fields if none are specified
         if (!empty($primaryEntityFields)) {
@@ -1240,7 +1234,7 @@ class ProductCategory implements IModel
                 } else {
                     $selectedFields = $relatedField;
                 }
-
+                
                 $includeMethodName = "include" . ucfirst($relation);
                 if (method_exists($this, $includeMethodName)) {
                     $items = $this->$includeMethodName($items, $select, $selectedFields, $format);
@@ -1364,7 +1358,7 @@ class ProductCategory implements IModel
             }, $primaryEntityFields);
             $selectFields = implode(', ', $formattedFields);
         }
-
+        
         $sql = "SELECT $distinct $selectFields FROM $quotedTableName";
         $conditions = [];
         $bindings = [];
@@ -1407,7 +1401,7 @@ class ProductCategory implements IModel
         if (!$record) {
             return [];
         }
-
+        
         foreach ($relatedEntityFields as $relation => $fields) {
             if (!isset($includes[$relation])) {
                 $includes[$relation] = true; // Implicitly include this relation
@@ -1422,7 +1416,7 @@ class ProductCategory implements IModel
                 } else {
                     $selectedFields = $relatedField;
                 }
-
+                
                 $includeMethodName = "include" . ucfirst($relation);
                 if (method_exists($this, $includeMethodName)) {
                     $record = $this->$includeMethodName($record, $select, $selectedFields, $format);
@@ -1527,7 +1521,7 @@ class ProductCategory implements IModel
         $sql = "UPDATE $quotedTableName SET ";
         $updateFields = [];
         $bindings = [];
-        $primaryKeyField = '';
+        $primaryKeyField = '';    
 
         Utility::checkFieldsExist(array_merge($data, $select, $include), $this->_fields, $this->_modelName);
 
@@ -1556,7 +1550,7 @@ class ProductCategory implements IModel
                     }
                 }
             }
-
+            
             if (!empty($updateFields)) {
                 $sql .= implode(', ', $updateFields);
 
@@ -2031,13 +2025,13 @@ class ProductCategory implements IModel
      * @return array An array of results with grouped data.
      * @throws \Exception Throws an exception if the database operation fails.
      */
-    public function groupBy(array $criteria, bool $format = false): array | object
+    public function groupBy(array $criteria, bool $format = false): array | object 
     {
         $aggregates = $criteria['aggregates'] ?? [];
         $dbType = $this->_pdo->getAttribute(\PDO::ATTR_DRIVER_NAME);
         $quotedTableName = $dbType == 'pgsql' ? "\"ProductCategory\"" : "`ProductCategory`";
         $groupByFields = implode(', ', $criteria);
-        $aggregateFields = array_map(fn ($a) => "{$a['function']}({$a['field']}) AS {$a['alias']}", $aggregates);
+        $aggregateFields = array_map(fn($a) => "{$a['function']}({$a['field']}) AS {$a['alias']}", $aggregates);
         $sql = "SELECT $groupByFields, " . implode(', ', $aggregateFields) . " FROM $quotedTableName GROUP BY $groupByFields";
 
         $stmt = $this->_pdo->prepare($sql);
@@ -2201,7 +2195,7 @@ class ProductCategory implements IModel
 ";
      * echo "Number of affected rows: " . $result['affectedRows'];
      */
-    public function deleteMany(array $criteria, bool $format = false): array | object
+    public function deleteMany(array $criteria, bool $format = false): array | object 
     {
         if (!isset($criteria['where'])) {
             throw new \Exception("The 'where' key is required in the deleteMany User.");
@@ -2277,7 +2271,7 @@ class ProductCategory implements IModel
         $select = $criteria['select'] ?? [];
         $dbType = $this->_dbType;
         $quotedTableName = $dbType === 'pgsql' ? "\"ProductCategory\"" : "`ProductCategory`";
-
+        
         $selectedFields = 'COUNT(*)';
         if (!empty($select)) {
             $selectedFields = '';

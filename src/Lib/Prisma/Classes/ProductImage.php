@@ -251,12 +251,25 @@ class ProductImage implements IModel
         if (!empty($foreignKeyIds)) {
             $tableModelName = new Product($this->_pdo);
             $isSelectOrInclude = !empty($selectedFields) ? 'select' : 'include';
+            $selectOrIncludeValues = $isSelectOrInclude === 'select' ? $selectedFields : $includeSelectedFields;
+
             foreach ($items as &$item) {
                 if (!isset($item[$foreignKey])) {
                     $item[$relationName] = [];
                     continue;
                 }
-                $relatedRecords = $tableModelName->findMany(['where' => [$primaryKey => $item[$foreignKey]], $isSelectOrInclude => $includeSelectedFields], $format);
+
+                $queryParams = ['where' => [$primaryKey => $item[$foreignKey]]];
+
+                foreach ($selectOrIncludeValues as $key => $value) {
+                    if (is_int($key)) {
+                        $queryParams = array_merge($queryParams, $value);
+                    } else {
+                        $queryParams[$key] = $value;
+                    }
+                }
+
+                $relatedRecords = $tableModelName->findMany($queryParams, $format);
                 $item[$relationName] = $relatedRecords;
 
                 if ($wasEmpty && isset($item[$foreignKey])) {

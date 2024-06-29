@@ -17,6 +17,7 @@ class User implements IModel
     public $updatedAt;
     public $roleId;
     public $userRole;
+    public $Cart;
     public $_col;
 
     protected $_fields;
@@ -159,11 +160,40 @@ class User implements IModel
                     ),
                   )
                 ),
+            'Cart' =>
+            array(
+                'name' => 'Cart',
+                'type' => 'Cart',
+                'isNullable' => '',
+                'isPrimaryKey' => '',
+                'decorators' =>
+                array (
+                    'inverseRelation' => 
+                    array (
+                      'fromModel' => 'User',
+                      'fromModelTableName' => 'Users',
+                      'fromField' => 'Cart',
+                      'toModel' => 'Cart',
+                      'toField' => 'user',
+                      'type' => 'OneToMany',
+                      'fields' => 
+                      array (
+                        0 => 'userId',
+                      ),
+                      'references' => 
+                      array (
+                        0 => 'id',
+                      ),
+                      'tableName' => 'user',
+                      'tablePrimaryKey' => 'id',
+                    ),
+                  )
+                ),
             );
 
         $this->_modelName = 'User';
         $this->_fieldsOnly = ['id', 'name', 'email', 'password', 'emailVerified', 'image', 'createdAt', 'updatedAt', 'roleId'];
-        $this->_fieldsRelated = ['userRole'];
+        $this->_fieldsRelated = ['userRole', 'Cart'];
 
         $this->_col = new class()
         {
@@ -178,6 +208,7 @@ class User implements IModel
                 public readonly string $updatedAt = 'updatedAt',
                 public readonly string $roleId = 'roleId',
                 public readonly string $userRole = 'userRole',
+                public readonly string $Cart = 'Cart',
             ) {
             }
         };
@@ -193,6 +224,7 @@ class User implements IModel
             $this->updatedAt = $data['updatedAt'] ?? null;
             $this->roleId = $data['roleId'] ?? null;
             $this->userRole = new UserRole($this->_pdo, $data['userRole'] ?? null);
+            $this->Cart = new Cart($this->_pdo, $data['Cart'] ?? null);
         }
     }
 
@@ -348,12 +380,25 @@ class User implements IModel
         if (!empty($foreignKeyIds)) {
             $tableModelName = new UserRole($this->_pdo);
             $isSelectOrInclude = !empty($selectedFields) ? 'select' : 'include';
+            $selectOrIncludeValues = $isSelectOrInclude === 'select' ? $selectedFields : $includeSelectedFields;
+
             foreach ($items as &$item) {
                 if (!isset($item[$foreignKey])) {
                     $item[$relationName] = [];
                     continue;
                 }
-                $relatedRecords = $tableModelName->findMany(['where' => [$primaryKey => $item[$foreignKey]], $isSelectOrInclude => $includeSelectedFields], $format);
+
+                $queryParams = ['where' => [$primaryKey => $item[$foreignKey]]];
+
+                foreach ($selectOrIncludeValues as $key => $value) {
+                    if (is_int($key)) {
+                        $queryParams = array_merge($queryParams, $value);
+                    } else {
+                        $queryParams[$key] = $value;
+                    }
+                }
+
+                $relatedRecords = $tableModelName->findMany($queryParams, $format);
                 $item[$relationName] = $relatedRecords;
 
                 if ($wasEmpty && isset($item[$foreignKey])) {
@@ -460,6 +505,134 @@ class User implements IModel
         }
     }
 
+    protected function includeCart(array $items, array $selectedFields = [], array $includeSelectedFields = [], bool $format = false) 
+    {
+        if (empty($items)) {
+            return $items;
+        }
+
+        $singleItem = false;
+        $itemsArrayType = Utility::checkArrayContents($items);
+        if ($itemsArrayType === ArrayType::Value) {
+            $items = [$items];
+            $singleItem = true;
+        }
+
+        $dbType = $this->_dbType;
+        $quotedTableName = $dbType == 'pgsql' ? "\"Users\"" : "`Users`";
+        $tableName = $dbType == 'pgsql' ? "\"user\"" : "`user`";
+        $modelName = 'Cart';
+        $relationName = 'Cart';
+        $foreignKeyIds = array_column($items, 'id');
+        $primaryKey = 'id';
+        $foreignKey = 'userId';
+        $primaryKeyQuoted = $dbType == 'pgsql' ? "\"id\"" : "`id`";
+        $foreignKeyQuoted = $dbType == 'pgsql' ? "\"userId\"" : "`userId`";
+        $foreignKeyIds = array_filter($foreignKeyIds); // Filter out any empty values
+        $foreignKeyIds = array_unique($foreignKeyIds);
+
+        $modelName = new Cart($this->_pdo);
+        foreach ($items as &$item) {
+            if (!isset($item[$primaryKey])) {
+                $item[$relationName] = [];
+                continue;
+            }
+            $relatedRecords = $modelName->findMany(['where' => [$foreignKey => $item[$primaryKey]], 'select' => $includeSelectedFields], $format);
+            $item[$relationName] = $relatedRecords;
+        }
+
+        return $singleItem ? reset($items) : $items;
+    }
+
+    protected function connectCart(string $relationName, array $connectData, string $lastInsertId, string $connectType = 'connect')
+    {
+        $dbType = $this->_dbType;
+        $quotedTableName = $dbType == 'pgsql' ? "\"Users\"" : "`Users`";
+        $tableName = $dbType == 'pgsql' ? "\"user\"" : "`user`";
+        $modelName = 'Cart';
+        $tablePrimaryKey = 'id';
+        $relatedForeignKey = 'userId';
+        $relationType = 'OneToMany';
+        $typeOfTableRelation = 'inverse';
+        $primaryKeyQuoted = $dbType == 'pgsql' ? "\"id\"" : "`id`";
+        $foreignKeyQuoted = $dbType == 'pgsql' ? "\"userId\"" : "`userId`";
+
+        if (!is_array($connectData) && $connectType !== 'disconnect') {
+            throw new \Exception("Error connecting $modelName: connectData must be an array");
+        }
+
+        if ($connectType === 'connectOrCreate' && (!array_key_exists('where', $connectData) || !array_key_exists('create', $connectData))) {
+            throw new \Exception("Error connecting $modelName: connectOrCreate requires both where and create keys");
+        }
+
+        $relationModel = new Cart($this->_pdo);
+
+        if ($connectType === 'create') {
+            $dataToCreate = [$relatedForeignKey => $lastInsertId, ...$connectData];
+            $relationModel->create(['data' => $dataToCreate]);
+            return;
+        }
+
+        if ($connectType === 'createMany') {
+
+            if ($typeOfTableRelation === 'inverse' && $relationType !== 'OneToMany') {
+                throw new \Exception("Error connecting $modelName: createMany is only supported for OneToMany relations");
+            }
+
+            $dataToUpdate = array_map(function($data) use ($relatedForeignKey, $lastInsertId) {
+                $data[$relatedForeignKey] = $lastInsertId;
+                return $data;
+            }, $connectData);
+
+            $relationModel->createMany(['data' => $dataToUpdate]);
+            return;
+        }
+
+        if ($connectType === 'update' || $connectType === 'updateMany') {
+            if ($typeOfTableRelation === 'inverse' && $relationType === 'OneToMany' && !isset($connectData['where']) && !isset($connectData['data'])) {
+                throw new \Exception("Error connecting $modelName: OneToMany relation requires both where and data keys");
+            }
+
+            try {
+                if ($connectType === 'updateMany') {
+                    $where = isset($connectData['where']) ? $connectData['where'] : ['where' => $connectData];
+                    return $relationModel->updateMany($connectData);
+                }
+                return $relationModel->update($connectData);
+            } catch (\Exception $e) {
+                throw new \Exception("Error connecting $modelName: " . $e->getMessage());
+            }
+        }
+
+        $where = isset($connectData['where']) ? $connectData['where'] : ['where' => $connectData];
+        $foundUnique = $relationModel->findUnique($where);
+
+        if (empty($foundUnique) && $connectType === 'connect') {
+            throw new \Exception("Error connecting $modelName: No record found for connectData");
+        }
+
+        if (empty($foundUnique) && $connectType === 'connectOrCreate') {
+            $foundUnique = $relationModel->create(['data' => $connectData['create']]);
+        }
+
+        if (!empty($foundUnique) && $connectType === 'connect') {
+            try {
+
+                $relationModel->update(['where' => [$tablePrimaryKey => $foundUnique[$tablePrimaryKey]], 'data' => [$relatedForeignKey => $lastInsertId]]);
+            } catch (\Exception $e) {
+                throw new \Exception("Error connecting Cart: " . $e->getMessage());
+            }
+        }
+
+        if (!empty($foundUnique) && $connectType === 'disconnect') {
+            try {
+
+                $relationModel->update(['where' => [$tablePrimaryKey => $foundUnique[$tablePrimaryKey]], 'data' => [$relatedForeignKey => null]]);
+            } catch (\Exception $e) {
+                throw new \Exception("Error disconnecting Cart: " . $e->getMessage());
+            }
+        }
+    }
     
     /**
      * Creates a new User in the database.
@@ -540,7 +713,7 @@ class User implements IModel
         $select = $data['select'] ?? [];
         $include = $data['include'] ?? [];
         $data = $data['data'];
-        $relationNames = ['userRole'];
+        $relationNames = ['userRole', 'Cart'];
 
         $primaryKeyField = '';
         $insertFields = [];
@@ -946,7 +1119,7 @@ class User implements IModel
         $dbType = $this->_dbType;
         $quotedTableName = $dbType == 'pgsql' ? "\"Users\"" : "`Users`";
 
-        $relationNames = ['userRole'];
+        $relationNames = ['userRole', 'Cart'];
 
         $timestamp = "";
         if (!isset($select[$tablePrimaryKey])) {
@@ -1102,7 +1275,7 @@ class User implements IModel
         $dbType = $this->_dbType;
         $quotedTableName = $dbType == 'pgsql' ? "\"Users\"" : "`Users`";
 
-        $relationNames = ['userRole'];
+        $relationNames = ['userRole', 'Cart'];
 
         $timestamp = "";
         if (!isset($select[$tablePrimaryKey])) {
@@ -1282,7 +1455,7 @@ class User implements IModel
         $dbType = $this->_dbType;
         $quotedTableName = $dbType == 'pgsql' ? "\"Users\"" : "`Users`";
 
-        $relationNames = ['userRole'];
+        $relationNames = ['userRole', 'Cart'];
 
         $timestamp = "";
         if (!isset($select[$tablePrimaryKey])) {
@@ -1464,7 +1637,7 @@ class User implements IModel
         $select = $data['select'] ?? [];
         $include = $data['include'] ?? [];
         $data = $data['data'];
-        $relationNames = ['userRole'];
+        $relationNames = ['userRole', 'Cart'];
 
         $dbType = $this->_dbType;
         $quotedTableName = $dbType == 'pgsql' ? "\"Users\"" : "`Users`";
@@ -1565,7 +1738,7 @@ class User implements IModel
                             $checkArrayContentType = Utility::checkArrayContents($relationData);
 
                             if ($checkArrayContentType !== ArrayType::Value) {
-                                throw new \Exception("To create a new record, the value of 'create' must be a single array with names as keys and the data to create as values in userRole model. example: ['create' => ['name' => 'someName']]");
+                                throw new \Exception("To create a new record, the value of 'create' must be a single array with names as keys and the data to create as values in Cart model. example: ['create' => ['name' => 'someName']]");
                             }
 
                             $connectMethodName = "connect" . ucfirst($relationName);
@@ -1578,7 +1751,7 @@ class User implements IModel
                             $checkArrayContentType = Utility::checkArrayContents($relationData);
 
                             if ($checkArrayContentType !== ArrayType::Associative) {
-                                throw new \Exception("To create many records, use an associative array with the field names as keys and the data to create as values in userRole model. ['createMany' => [['name' => 'someName'], ['name' => 'someOtherName']]");
+                                throw new \Exception("To create many records, use an associative array with the field names as keys and the data to create as values in Cart model. ['createMany' => [['name' => 'someName'], ['name' => 'someOtherName']]");
                             }
 
                             $connectMethodName = "connect" . ucfirst($relationName);
@@ -1603,7 +1776,7 @@ class User implements IModel
                             $checkArrayContentType = Utility::checkArrayContents($connectData);
 
                             if (isset($relationDataName['connect']) && $checkArrayContentType !== ArrayType::Value) {
-                                throw new \Exception("The 'connect' key must be an associative array with the field names as keys and the data to create as values related userRole model. example: ['connect' => ['id' => 'someId']]");
+                                throw new \Exception("The 'connect' key must be an associative array with the field names as keys and the data to create as values related Cart model. example: ['connect' => ['id' => 'someId']]");
                             }
                         }
 
@@ -1612,7 +1785,7 @@ class User implements IModel
                             $checkArrayContentType = Utility::checkArrayContents($connectOrCreateData);
 
                             if (isset($relationDataName['connectOrCreate']) && $checkArrayContentType !== ArrayType::Associative) {
-                                throw new \Exception("The 'connectOrCreate' key must be an associative array with the field names as keys and the data to create as values related userRole model. example: ['connectOrCreate' => ['where' => ['id' => 'someId'], 'create' => ['name' => 'someName']]");
+                                throw new \Exception("The 'connectOrCreate' key must be an associative array with the field names as keys and the data to create as values related Cart model. example: ['connectOrCreate' => ['where' => ['id' => 'someId'], 'create' => ['name' => 'someName']]");
                             }
                         }
 
@@ -1623,7 +1796,7 @@ class User implements IModel
                                 $checkArrayContentType = Utility::checkArrayContents($disconnectData);
 
                                 if (isset($relationDataName['disconnect']) && $checkArrayContentType !== ArrayType::Value) {
-                                    throw new \Exception("The 'disconnect' key must be an associative array with the field names as keys and the data to create as values related userRole model. example: ['disconnect' => ['id' => 'someId']]");
+                                    throw new \Exception("The 'disconnect' key must be an associative array with the field names as keys and the data to create as values related Cart model. example: ['disconnect' => ['id' => 'someId']]");
                                 }
                             }
                         }

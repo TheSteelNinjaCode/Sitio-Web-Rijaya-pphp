@@ -5,16 +5,14 @@ namespace Lib\Prisma\Classes;
 use Lib\Prisma\Model\IModel;
 use Lib\Validator;
 
-class Category implements IModel
+class Cart implements IModel
 {
     public $id;
-    public $name;
-    public $description;
-    public $image;
-    public $products;
     public $createdAt;
     public $updatedAt;
-    public $ProductCategory;
+    public $userId;
+    public $user;
+    public $items;
     public $_col;
 
     protected $_fields;
@@ -44,65 +42,6 @@ class Category implements IModel
                     'default' => 'cuid',
                   )
                 ),
-            'name' =>
-            array(
-                'name' => 'name',
-                'type' => 'String',
-                'isNullable' => '',
-                'isPrimaryKey' => '',
-                'decorators' =>
-                array (
-                  )
-                ),
-            'description' =>
-            array(
-                'name' => 'description',
-                'type' => 'String',
-                'isNullable' => '1',
-                'isPrimaryKey' => '',
-                'decorators' =>
-                array (
-                  )
-                ),
-            'image' =>
-            array(
-                'name' => 'image',
-                'type' => 'String',
-                'isNullable' => '1',
-                'isPrimaryKey' => '',
-                'decorators' =>
-                array (
-                  )
-                ),
-            'products' =>
-            array(
-                'name' => 'products',
-                'type' => 'Product',
-                'isNullable' => '',
-                'isPrimaryKey' => '',
-                'decorators' =>
-                array (
-                    'inverseRelation' => 
-                    array (
-                      'fromModel' => 'Category',
-                      'fromModelTableName' => 'Category',
-                      'fromField' => 'products',
-                      'toModel' => 'Product',
-                      'toField' => 'Category',
-                      'type' => 'OneToMany',
-                      'fields' => 
-                      array (
-                        0 => 'id',
-                      ),
-                      'references' => 
-                      array (
-                        0 => 'id',
-                      ),
-                      'tableName' => 'Product',
-                      'tablePrimaryKey' => 'id',
-                    ),
-                  )
-                ),
             'createdAt' =>
             array(
                 'name' => 'createdAt',
@@ -125,65 +64,101 @@ class Category implements IModel
                     'updatedAt' => true,
                   )
                 ),
-            'ProductCategory' =>
+            'userId' =>
             array(
-                'name' => 'ProductCategory',
-                'type' => 'ProductCategory',
+                'name' => 'userId',
+                'type' => 'String',
+                'isNullable' => '',
+                'isPrimaryKey' => '',
+                'decorators' =>
+                array (
+                  )
+                ),
+            'user' =>
+            array(
+                'name' => 'user',
+                'type' => 'User',
+                'isNullable' => '',
+                'isPrimaryKey' => '',
+                'decorators' =>
+                array (
+                    'relation' => 
+                    array (
+                      'name' => 'user',
+                      'model' => 'User',
+                      'relationModelName' => 'Users',
+                      'fields' => 
+                      array (
+                        0 => 'userId',
+                      ),
+                      'references' => 
+                      array (
+                        0 => 'id',
+                      ),
+                      'onDelete' => 'SetNull',
+                      'onUpdate' => 'Cascade',
+                      'type' => 'OneToMany',
+                      'tableName' => 'Users',
+                      'tableModelName' => 'Cart',
+                      'tablePrimaryKey' => 'id',
+                    ),
+                  )
+                ),
+            'items' =>
+            array(
+                'name' => 'items',
+                'type' => 'CartItem',
                 'isNullable' => '',
                 'isPrimaryKey' => '',
                 'decorators' =>
                 array (
                     'inverseRelation' => 
                     array (
-                      'fromModel' => 'Category',
-                      'fromModelTableName' => 'Category',
-                      'fromField' => 'ProductCategory',
-                      'toModel' => 'ProductCategory',
-                      'toField' => 'category',
+                      'fromModel' => 'Cart',
+                      'fromModelTableName' => 'Cart',
+                      'fromField' => 'items',
+                      'toModel' => 'CartItem',
+                      'toField' => 'cart',
                       'type' => 'OneToMany',
                       'fields' => 
                       array (
-                        0 => 'categoryId',
+                        0 => 'cartId',
                       ),
                       'references' => 
                       array (
                         0 => 'id',
                       ),
-                      'tableName' => 'category',
-                      'tablePrimaryKey' => 'categoryId',
+                      'tableName' => 'cart',
+                      'tablePrimaryKey' => 'cartId',
                     ),
                   )
                 ),
             );
 
-        $this->_modelName = 'Category';
-        $this->_fieldsOnly = ['id', 'name', 'description', 'image', 'createdAt', 'updatedAt'];
-        $this->_fieldsRelated = ['products', 'ProductCategory'];
+        $this->_modelName = 'Cart';
+        $this->_fieldsOnly = ['id', 'createdAt', 'updatedAt', 'userId'];
+        $this->_fieldsRelated = ['user', 'items'];
 
         $this->_col = new class()
         {
             public function __construct(
                 public readonly string $id = 'id',
-                public readonly string $name = 'name',
-                public readonly string $description = 'description',
-                public readonly string $image = 'image',
-                public readonly string $products = 'products',
                 public readonly string $createdAt = 'createdAt',
                 public readonly string $updatedAt = 'updatedAt',
-                public readonly string $ProductCategory = 'ProductCategory',
+                public readonly string $userId = 'userId',
+                public readonly string $user = 'user',
+                public readonly string $items = 'items',
             ) {
             }
         };
 
         if ($data) {
             $this->id = $data['id'] ?? null;
-            $this->name = $data['name'] ?? null;
-            $this->description = $data['description'] ?? null;
-            $this->image = $data['image'] ?? null;
-            $this->products = new Product($this->_pdo, $data['products'] ?? null);
             $this->createdAt = $data['createdAt'] ?? null;
             $this->updatedAt = $data['updatedAt'] ?? null;
-            $this->ProductCategory = new ProductCategory($this->_pdo, $data['ProductCategory'] ?? null);
+            $this->userId = $data['userId'] ?? null;
+            $this->user = new User($this->_pdo, $data['user'] ?? null);
+            $this->items = new CartItem($this->_pdo, $data['items'] ?? null);
         }
     }
 
@@ -196,39 +171,6 @@ class Category implements IModel
     {
         $validatedValue = Validator::string($value);
         $this->id = $validatedValue;
-    }
-
-    public function getName()
-    {
-        return $this->name;
-    }
-
-    public function setName($value)
-    {
-        $validatedValue = Validator::string($value);
-        $this->name = $validatedValue;
-    }
-
-    public function getDescription()
-    {
-        return $this->description;
-    }
-
-    public function setDescription($value)
-    {
-        $validatedValue = Validator::string($value);
-        $this->description = $validatedValue;
-    }
-
-    public function getImage()
-    {
-        return $this->image;
-    }
-
-    public function setImage($value)
-    {
-        $validatedValue = Validator::string($value);
-        $this->image = $validatedValue;
     }
 
     public function getCreatedAt()
@@ -253,7 +195,18 @@ class Category implements IModel
         $this->updatedAt = $validatedValue;
     }
 
-    protected function includeProducts(array $items, array $selectedFields = [], array $includeSelectedFields = [], bool $format = false) 
+    public function getUserId()
+    {
+        return $this->userId;
+    }
+
+    public function setUserId($value)
+    {
+        $validatedValue = Validator::string($value);
+        $this->userId = $validatedValue;
+    }
+
+    protected function includeUser(array $items, array $selectedFields = [], array $includeSelectedFields = [], bool $format = false) 
     {
         if (empty($items)) {
             return $items;
@@ -267,43 +220,93 @@ class Category implements IModel
         }
 
         $dbType = $this->_dbType;
-        $quotedTableName = $dbType == 'pgsql' ? "\"Category\"" : "`Category`";
-        $tableName = $dbType == 'pgsql' ? "\"Product\"" : "`Product`";
-        $modelName = 'Product';
-        $relationName = 'products';
-        $foreignKeyIds = array_column($items, 'id');
-        $primaryKey = 'id';
-        $foreignKey = 'id';
-        $primaryKeyQuoted = $dbType == 'pgsql' ? "\"id\"" : "`id`";
-        $foreignKeyQuoted = $dbType == 'pgsql' ? "\"id\"" : "`id`";
-        $foreignKeyIds = array_filter($foreignKeyIds); // Filter out any empty values
-        $foreignKeyIds = array_unique($foreignKeyIds);
-
-        $modelName = new Product($this->_pdo);
-        foreach ($items as &$item) {
-            if (!isset($item[$primaryKey])) {
-                $item[$relationName] = [];
-                continue;
-            }
-            $relatedRecords = $modelName->findMany(['where' => [$foreignKey => $item[$primaryKey]], 'select' => $includeSelectedFields], $format);
-            $item[$relationName] = $relatedRecords;
-        }
-
-        return $singleItem ? reset($items) : $items;
-    }
-
-    protected function connectProducts(string $relationName, array $connectData, string $lastInsertId, string $connectType = 'connect')
-    {
-        $dbType = $this->_dbType;
-        $quotedTableName = $dbType == 'pgsql' ? "\"Category\"" : "`Category`";
-        $tableName = $dbType == 'pgsql' ? "\"Product\"" : "`Product`";
-        $modelName = 'Product';
+        $quotedTableName = $dbType == 'pgsql' ? "\"Users\"" : "`Users`";
+        $tableName = $dbType == 'pgsql' ? "\"Users\"" : "`Users`";
+        $tableModelName = 'Cart';
         $tablePrimaryKey = 'id';
-        $relatedForeignKey = 'id';
-        $relationType = 'OneToMany';
-        $typeOfTableRelation = 'inverse';
+        $tablePrimaryKeyQuoted = $dbType == 'pgsql' ? "\"id\"" : "`id`";
+        $modelName = 'User';
+        $relationName = 'user';
+        $foreignKeyIds = array_column($items, 'userId');
+        $primaryKey = 'id';
+        $foreignKey = 'userId';
         $primaryKeyQuoted = $dbType == 'pgsql' ? "\"id\"" : "`id`";
-        $foreignKeyQuoted = $dbType == 'pgsql' ? "\"id\"" : "`id`";
+        $foreignKeyQuoted = $dbType == 'pgsql' ? "\"userId\"" : "`userId`";
+        $foreignKeyIds = array_filter($foreignKeyIds); // Filter out any empty values
+        $foreignKeyIds = array_unique($foreignKeyIds);
+        $wasEmpty = false;
+
+        if (empty($foreignKeyIds)) {
+            $itemsIds = array_column($items, $tablePrimaryKey);
+            $placeholders = implode(', ', array_fill(0, count($itemsIds), '?'));
+            $relatedModelSql = "SELECT $foreignKeyQuoted FROM $tableName WHERE $tablePrimaryKeyQuoted IN ($placeholders)";
+            $stmt = $this->_pdo->prepare($relatedModelSql);
+            $stmt->execute(array_values($itemsIds));
+            $relatedModelResult = $stmt->fetchAll(\PDO::FETCH_ASSOC);
+
+            $foreignKeyIds = array_column($relatedModelResult, $foreignKey);
+            $foreignKeyIds = array_filter($foreignKeyIds);
+            $foreignKeyIds = array_unique($foreignKeyIds);
+
+            $rowCount = 0;
+            foreach ($relatedModelResult as $result) {
+                $items[$rowCount++][$foreignKey] = $result[$foreignKey];
+            }
+
+            $wasEmpty = true;
+        }
+
+        if (!empty($foreignKeyIds)) {
+            $tableModelName = new User($this->_pdo);
+            $isSelectOrInclude = !empty($selectedFields) ? 'select' : 'include';
+            $selectOrIncludeValues = $isSelectOrInclude === 'select' ? $selectedFields : $includeSelectedFields;
+
+            foreach ($items as &$item) {
+                if (!isset($item[$foreignKey])) {
+                    $item[$relationName] = [];
+                    continue;
+                }
+
+                $queryParams = ['where' => [$primaryKey => $item[$foreignKey]]];
+
+                foreach ($selectOrIncludeValues as $key => $value) {
+                    if (is_int($key)) {
+                        $queryParams = array_merge($queryParams, $value);
+                    } else {
+                        $queryParams[$key] = $value;
+                    }
+                }
+
+                $relatedRecords = $tableModelName->findMany($queryParams, $format);
+                $item[$relationName] = $relatedRecords;
+
+                if ($wasEmpty && isset($item[$foreignKey])) {
+                    unset($item[$foreignKey]);
+                }
+            }
+        } else {
+            foreach ($items as &$item) {
+                $item[$relationName] = null;
+            }
+        }
+
+        return $singleItem ? reset($items) : $items;
+    }
+
+    protected function connectUser(string $relationName, array|bool $connectData, string $lastInsertId, string $connectType = 'connect')
+    {
+        $dbType = $this->_dbType;
+        $quotedTableName = $dbType == 'pgsql' ? "\"Users\"" : "`Users`";
+        $tableName = $dbType == 'pgsql' ? "\"Users\"" : "`Users`";
+        $modelName = 'User';
+        $tablePrimaryKey = 'id';
+        $tableForeignKey = 'userId';
+        $relationType = 'OneToMany';
+        $typeOfTableRelation = 'relation';
+        $tablePrimaryKeyQuoted = $dbType == 'pgsql' ? "\"id\"" : "`id`";
+        $relatedPrimaryKey = 'id';
+        $primaryKeyQuoted = $dbType == 'pgsql' ? "\"id\"" : "`id`";
+        $foreignKeyQuoted = $dbType == 'pgsql' ? "\"userId\"" : "`userId`";
 
         if (!is_array($connectData) && $connectType !== 'disconnect') {
             throw new \Exception("Error connecting $modelName: connectData must be an array");
@@ -313,75 +316,75 @@ class Category implements IModel
             throw new \Exception("Error connecting $modelName: connectOrCreate requires both where and create keys");
         }
 
-        $relationModel = new Product($this->_pdo);
+        if ($typeOfTableRelation === 'relation' && $relationType === 'OneToMany' && $connectType === 'createMany') {
+            throw new \Exception("Error connecting $modelName: relation does not support 'createMany' use 'create' instead");
+        }
+
+        if (is_bool($connectData) && $connectType === 'disconnect') {
+            try {
+                $this->update(['where' => [$tablePrimaryKey => $lastInsertId], 'data' => [$tableForeignKey => null]]);
+                return;
+            } catch (\Exception $e) {
+                throw new \Exception("Error disconnecting $modelName: " . $e->getMessage());
+            }
+        }
+
+        $relationModel = new User($this->_pdo);
+        $where = $connectData['where'] ?? $connectData;
 
         if ($connectType === 'create') {
-            $dataToCreate = [$relatedForeignKey => $lastInsertId, ...$connectData];
-            $relationModel->create(['data' => $dataToCreate]);
-            return;
+            $createdData = $relationModel->create(['data' => $connectData]);
+            $where = [$relatedPrimaryKey => $createdData[$relatedPrimaryKey]];
+            $connectType = 'connect';
         }
 
-        if ($connectType === 'createMany') {
-
-            if ($typeOfTableRelation === 'inverse' && $relationType !== 'OneToMany') {
-                throw new \Exception("Error connecting $modelName: createMany is only supported for OneToMany relations");
-            }
-
-            $dataToUpdate = array_map(function($data) use ($relatedForeignKey, $lastInsertId) {
-                $data[$relatedForeignKey] = $lastInsertId;
-                return $data;
-            }, $connectData);
-
-            $relationModel->createMany(['data' => $dataToUpdate]);
-            return;
-        }
-
-        if ($connectType === 'update' || $connectType === 'updateMany') {
-            if ($typeOfTableRelation === 'inverse' && $relationType === 'OneToMany' && !isset($connectData['where']) && !isset($connectData['data'])) {
-                throw new \Exception("Error connecting $modelName: OneToMany relation requires both where and data keys");
+        if ($connectType === 'update') {
+            if ($typeOfTableRelation === 'relation' && $relationType === 'OneToOne' && count($connectData) > 1) {
+                throw new \Exception("Error connecting $modelName: OneToOne relation can only update one field");
             }
 
             try {
-                if ($connectType === 'updateMany') {
-                    $where = isset($connectData['where']) ? $connectData['where'] : ['where' => $connectData];
-                    return $relationModel->updateMany($connectData);
-                }
-                return $relationModel->update($connectData);
+                $findUniqueRelatedModel = $this->findUnique(['where' => [$tablePrimaryKey => $lastInsertId]]);
+                $relationModel->update(['where' => [$relatedPrimaryKey => $findUniqueRelatedModel[$tableForeignKey]], 'data' => $connectData]);
+                return;
             } catch (\Exception $e) {
                 throw new \Exception("Error connecting $modelName: " . $e->getMessage());
             }
         }
 
-        $where = isset($connectData['where']) ? $connectData['where'] : ['where' => $connectData];
-        $foundUnique = $relationModel->findUnique($where);
+        $foundUnique = $relationModel->findUnique(['where' => $where]);
 
         if (empty($foundUnique) && $connectType === 'connect') {
             throw new \Exception("Error connecting $modelName: No record found for connectData");
         }
 
-        if (empty($foundUnique) && $connectType === 'connectOrCreate') {
-            $foundUnique = $relationModel->create(['data' => $connectData['create']]);
+        if ($connectType === 'connectOrCreate') {
+            if (empty($foundUnique)) {
+                $foundUnique = $relationModel->create(['data' => $connectData['create']]);
+            }
+            $connectType = 'connect';
         }
 
         if (!empty($foundUnique) && $connectType === 'connect') {
             try {
 
-                $relationModel->update(['where' => [$tablePrimaryKey => $foundUnique[$tablePrimaryKey]], 'data' => [$relatedForeignKey => $lastInsertId]]);
+                $this->update(['where' => [$tablePrimaryKey => $lastInsertId], 'data' => [$tableForeignKey => $foundUnique[$relatedPrimaryKey]]]);
             } catch (\Exception $e) {
-                throw new \Exception("Error connecting products: " . $e->getMessage());
+                throw new \Exception("Error connecting user: " . $e->getMessage());
             }
         }
 
         if (!empty($foundUnique) && $connectType === 'disconnect') {
             try {
 
-                $relationModel->update(['where' => [$tablePrimaryKey => $foundUnique[$tablePrimaryKey]], 'data' => [$relatedForeignKey => null]]);
+                $this->update(['where' => [$tablePrimaryKey => $lastInsertId], 'data' => [$tableForeignKey => null]]);
             } catch (\Exception $e) {
-                throw new \Exception("Error disconnecting products: " . $e->getMessage());
+                throw new \Exception("Error disconnecting user: " . $e->getMessage());
             }
         }
     }
-    protected function includeProductCategory(array $items, array $selectedFields = [], array $includeSelectedFields = [], bool $format = false) 
+
+    protected function includeItems(array $items, array $selectedFields = [], array $includeSelectedFields = [], bool $format = false) 
     {
         if (empty($items)) {
             return $items;
@@ -395,19 +398,19 @@ class Category implements IModel
         }
 
         $dbType = $this->_dbType;
-        $quotedTableName = $dbType == 'pgsql' ? "\"Category\"" : "`Category`";
-        $tableName = $dbType == 'pgsql' ? "\"category\"" : "`category`";
-        $modelName = 'ProductCategory';
-        $relationName = 'ProductCategory';
+        $quotedTableName = $dbType == 'pgsql' ? "\"Cart\"" : "`Cart`";
+        $tableName = $dbType == 'pgsql' ? "\"cart\"" : "`cart`";
+        $modelName = 'CartItem';
+        $relationName = 'items';
         $foreignKeyIds = array_column($items, 'id');
         $primaryKey = 'id';
-        $foreignKey = 'categoryId';
+        $foreignKey = 'cartId';
         $primaryKeyQuoted = $dbType == 'pgsql' ? "\"id\"" : "`id`";
-        $foreignKeyQuoted = $dbType == 'pgsql' ? "\"categoryId\"" : "`categoryId`";
+        $foreignKeyQuoted = $dbType == 'pgsql' ? "\"cartId\"" : "`cartId`";
         $foreignKeyIds = array_filter($foreignKeyIds); // Filter out any empty values
         $foreignKeyIds = array_unique($foreignKeyIds);
 
-        $modelName = new ProductCategory($this->_pdo);
+        $modelName = new CartItem($this->_pdo);
         foreach ($items as &$item) {
             if (!isset($item[$primaryKey])) {
                 $item[$relationName] = [];
@@ -420,18 +423,18 @@ class Category implements IModel
         return $singleItem ? reset($items) : $items;
     }
 
-    protected function connectProductCategory(string $relationName, array $connectData, string $lastInsertId, string $connectType = 'connect')
+    protected function connectItems(string $relationName, array $connectData, string $lastInsertId, string $connectType = 'connect')
     {
         $dbType = $this->_dbType;
-        $quotedTableName = $dbType == 'pgsql' ? "\"Category\"" : "`Category`";
-        $tableName = $dbType == 'pgsql' ? "\"category\"" : "`category`";
-        $modelName = 'ProductCategory';
-        $tablePrimaryKey = 'categoryId';
-        $relatedForeignKey = 'categoryId';
+        $quotedTableName = $dbType == 'pgsql' ? "\"Cart\"" : "`Cart`";
+        $tableName = $dbType == 'pgsql' ? "\"cart\"" : "`cart`";
+        $modelName = 'CartItem';
+        $tablePrimaryKey = 'cartId';
+        $relatedForeignKey = 'cartId';
         $relationType = 'OneToMany';
         $typeOfTableRelation = 'inverse';
         $primaryKeyQuoted = $dbType == 'pgsql' ? "\"id\"" : "`id`";
-        $foreignKeyQuoted = $dbType == 'pgsql' ? "\"categoryId\"" : "`categoryId`";
+        $foreignKeyQuoted = $dbType == 'pgsql' ? "\"cartId\"" : "`cartId`";
 
         if (!is_array($connectData) && $connectType !== 'disconnect') {
             throw new \Exception("Error connecting $modelName: connectData must be an array");
@@ -441,7 +444,7 @@ class Category implements IModel
             throw new \Exception("Error connecting $modelName: connectOrCreate requires both where and create keys");
         }
 
-        $relationModel = new ProductCategory($this->_pdo);
+        $relationModel = new CartItem($this->_pdo);
 
         if ($connectType === 'create') {
             $dataToCreate = [$relatedForeignKey => $lastInsertId, ...$connectData];
@@ -496,7 +499,7 @@ class Category implements IModel
 
                 $relationModel->update(['where' => [$tablePrimaryKey => $foundUnique[$tablePrimaryKey]], 'data' => [$relatedForeignKey => $lastInsertId]]);
             } catch (\Exception $e) {
-                throw new \Exception("Error connecting ProductCategory: " . $e->getMessage());
+                throw new \Exception("Error connecting items: " . $e->getMessage());
             }
         }
 
@@ -505,7 +508,7 @@ class Category implements IModel
 
                 $relationModel->update(['where' => [$tablePrimaryKey => $foundUnique[$tablePrimaryKey]], 'data' => [$relatedForeignKey => null]]);
             } catch (\Exception $e) {
-                throw new \Exception("Error disconnecting ProductCategory: " . $e->getMessage());
+                throw new \Exception("Error disconnecting items: " . $e->getMessage());
             }
         }
     }
@@ -571,7 +574,7 @@ class Category implements IModel
     public function create(array $data, bool $format = false): array | object 
     {
         if (!isset($data['data'])) {
-            throw new \Exception("The 'data' key is required when creating a new Category.");
+            throw new \Exception("The 'data' key is required when creating a new Cart.");
         }
 
         if (!is_array($data['data'])) {
@@ -587,25 +590,25 @@ class Category implements IModel
         $data['data']['updatedAt'] = date('Y-m-d H:i:s');
 
         $requiredFieldsMap = [
-            'name' => 'String',
+            'userId' => 'String',
         ];
         foreach ($requiredFieldsMap as $fieldName => $fieldType) {
             if (!isset($data['data'][$fieldName])) {
-                throw new \Exception("The '$fieldName' field of type '$fieldType' is required when creating a new Category.");
+                throw new \Exception("The '$fieldName' field of type '$fieldType' is required when creating a new Cart.");
             }
         }
         
         $select = $data['select'] ?? [];
         $include = $data['include'] ?? [];
         $data = $data['data'];
-        $relationNames = ['products', 'ProductCategory'];
+        $relationNames = ['user', 'items'];
 
         $primaryKeyField = '';
         $insertFields = [];
         $placeholders = [];
         $bindings = [];
         $dbType = $this->_dbType;
-        $quotedTableName = $dbType == 'pgsql' ? "\"Category\"" : "`Category`";
+        $quotedTableName = $dbType == 'pgsql' ? "\"Cart\"" : "`Cart`";
 
         Utility::checkFieldsExist(array_merge($data, $select, $include), $this->_fields, $this->_modelName);
 
@@ -767,7 +770,7 @@ class Category implements IModel
                         }
                     } else {
                         if (isset($relationDataName['create']) || isset($relationDataName['createMany']) || isset($relationDataName['connect']) || isset($relationDataName['connectOrCreate'])) {
-                            throw new \Exception("The relation name '$relationName' is not defined in the Category model.");
+                            throw new \Exception("The relation name '$relationName' is not defined in the Cart model.");
                         }
                     }
                 }
@@ -835,7 +838,7 @@ class Category implements IModel
     public function createMany(array $data, bool $format = false): array | object
     {
         if (!isset($data['data'])) {
-            throw new \Exception("The 'data' key is required when creating a new Category.");
+            throw new \Exception("The 'data' key is required when creating a new Cart.");
         }
 
         if (!is_array($data['data'])) {
@@ -850,18 +853,18 @@ class Category implements IModel
         }
 
         $requiredFieldsMap = [
-            'name' => 'String',
+            'userId' => 'String',
         ];
         foreach ($data['data'] as $item) {
             foreach ($requiredFieldsMap as $fieldName => $fieldType) {
                 if (!isset($item[$fieldName])) {
-                    throw new \Exception("The '$fieldName' field of type '$fieldType' is required when creating a new Category.");
+                    throw new \Exception("The '$fieldName' field of type '$fieldType' is required when creating a new Cart.");
                 }
             }
         }
 
         $dbType = $this->_dbType;
-        $quotedTableName = $dbType == 'pgsql' ? "\"Category\"" : "`Category`";
+        $quotedTableName = $dbType == 'pgsql' ? "\"Cart\"" : "`Cart`";
         $skipDuplicates = $data['skipDuplicates'] ?? false;
         $data = $data['data'];
         $allPlaceholders = [];
@@ -1013,9 +1016,9 @@ class Category implements IModel
         $includes = [];
 
         $dbType = $this->_dbType;
-        $quotedTableName = $dbType == 'pgsql' ? "\"Category\"" : "`Category`";
+        $quotedTableName = $dbType == 'pgsql' ? "\"Cart\"" : "`Cart`";
 
-        $relationNames = ['products', 'ProductCategory'];
+        $relationNames = ['user', 'items'];
 
         $timestamp = "";
         if (!isset($select[$tablePrimaryKey])) {
@@ -1050,7 +1053,7 @@ class Category implements IModel
             $bindings[':id'] = $validatedValue;
         }
         if (empty($conditions)) {
-            throw new \Exception("No valid 'where' conditions provided for finding a unique record in Category.");
+            throw new \Exception("No valid 'where' conditions provided for finding a unique record in Cart.");
         }
 
         $sql .= implode(' AND ', $conditions);
@@ -1087,7 +1090,7 @@ class Category implements IModel
                 if (method_exists($this, $includeMethodName)) {
                     $record = $this->$includeMethodName($record, $select, $selectedFields, $format);
                 } else {
-                    throw new \Exception("The '$relation' does not exist, in the Category model.");
+                    throw new \Exception("The '$relation' does not exist, in the Cart model.");
                 }
             }
         }
@@ -1164,9 +1167,9 @@ class Category implements IModel
         $includes = [];
 
         $dbType = $this->_dbType;
-        $quotedTableName = $dbType == 'pgsql' ? "\"Category\"" : "`Category`";
+        $quotedTableName = $dbType == 'pgsql' ? "\"Cart\"" : "`Cart`";
 
-        $relationNames = ['products', 'ProductCategory'];
+        $relationNames = ['user', 'items'];
 
         $timestamp = "";
         if (!isset($select[$tablePrimaryKey])) {
@@ -1251,7 +1254,7 @@ class Category implements IModel
                 if (method_exists($this, $includeMethodName)) {
                     $items = $this->$includeMethodName($items, $select, $selectedFields, $format);
                 } else {
-                    throw new \Exception("The '$relation' does not exist, in the Category model.");
+                    throw new \Exception("The '$relation' does not exist, in the Cart model.");
                 }
             }
         }
@@ -1344,9 +1347,9 @@ class Category implements IModel
         $includes = [];
 
         $dbType = $this->_dbType;
-        $quotedTableName = $dbType == 'pgsql' ? "\"Category\"" : "`Category`";
+        $quotedTableName = $dbType == 'pgsql' ? "\"Cart\"" : "`Cart`";
 
-        $relationNames = ['products', 'ProductCategory'];
+        $relationNames = ['user', 'items'];
 
         $timestamp = "";
         if (!isset($select[$tablePrimaryKey])) {
@@ -1433,7 +1436,7 @@ class Category implements IModel
                 if (method_exists($this, $includeMethodName)) {
                     $record = $this->$includeMethodName($record, $select, $selectedFields, $format);
                 } else {
-                    throw new \Exception("The '$relation' does not exist, in the Category model.");
+                    throw new \Exception("The '$relation' does not exist, in the Cart model.");
                 }
             }
         }
@@ -1500,7 +1503,7 @@ class Category implements IModel
     public function update(array $data, bool $format = false): array | object
     {
         if (!isset($data['where'])) {
-            throw new \Exception("The 'where' key is required in the update Category.");
+            throw new \Exception("The 'where' key is required in the update Cart.");
         }
 
         if (!is_array($data['where'])) {
@@ -1508,7 +1511,7 @@ class Category implements IModel
         }
 
         if (!isset($data['data'])) {
-            throw new \Exception("The 'data' key is required in the update Category.");
+            throw new \Exception("The 'data' key is required in the update Cart.");
         }
 
         if (!is_array($data['data'])) {
@@ -1525,11 +1528,11 @@ class Category implements IModel
         $data['data']['updatedAt'] = date('Y-m-d H:i:s');
 
         $requiredFieldsMap = [
-            'name' => 'String',
+            'userId' => 'String',
         ];
         foreach ($requiredFieldsMap as $fieldName => $fieldType) {
             if (isset($data['data'][$fieldName]) && empty($data['data'][$fieldName])) {
-                throw new \Exception("The '$fieldName' field of type '$fieldType' is required in Category Model.");
+                throw new \Exception("The '$fieldName' field of type '$fieldType' is required in Cart Model.");
             }
         }
 
@@ -1537,10 +1540,10 @@ class Category implements IModel
         $select = $data['select'] ?? [];
         $include = $data['include'] ?? [];
         $data = $data['data'];
-        $relationNames = ['products', 'ProductCategory'];
+        $relationNames = ['user', 'items'];
 
         $dbType = $this->_dbType;
-        $quotedTableName = $dbType == 'pgsql' ? "\"Category\"" : "`Category`";
+        $quotedTableName = $dbType == 'pgsql' ? "\"Cart\"" : "`Cart`";
         $sql = "UPDATE $quotedTableName SET ";
         $updateFields = [];
         $bindings = [];
@@ -1584,7 +1587,7 @@ class Category implements IModel
                             $whereClauses[] = "$fieldName = :where_$fieldName";
                             $bindings[":where_$fieldName"] = $fieldValue;
                         } else {
-                            throw new \Exception("The '$fieldName' field does not exist in the Category model.");
+                            throw new \Exception("The '$fieldName' field does not exist in the Cart model.");
                         }
                     }
 
@@ -1638,7 +1641,7 @@ class Category implements IModel
                             $checkArrayContentType = Utility::checkArrayContents($relationData);
 
                             if ($checkArrayContentType !== ArrayType::Value) {
-                                throw new \Exception("To create a new record, the value of 'create' must be a single array with names as keys and the data to create as values in ProductCategory model. example: ['create' => ['name' => 'someName']]");
+                                throw new \Exception("To create a new record, the value of 'create' must be a single array with names as keys and the data to create as values in items model. example: ['create' => ['name' => 'someName']]");
                             }
 
                             $connectMethodName = "connect" . ucfirst($relationName);
@@ -1651,7 +1654,7 @@ class Category implements IModel
                             $checkArrayContentType = Utility::checkArrayContents($relationData);
 
                             if ($checkArrayContentType !== ArrayType::Associative) {
-                                throw new \Exception("To create many records, use an associative array with the field names as keys and the data to create as values in ProductCategory model. ['createMany' => [['name' => 'someName'], ['name' => 'someOtherName']]");
+                                throw new \Exception("To create many records, use an associative array with the field names as keys and the data to create as values in items model. ['createMany' => [['name' => 'someName'], ['name' => 'someOtherName']]");
                             }
 
                             $connectMethodName = "connect" . ucfirst($relationName);
@@ -1676,7 +1679,7 @@ class Category implements IModel
                             $checkArrayContentType = Utility::checkArrayContents($connectData);
 
                             if (isset($relationDataName['connect']) && $checkArrayContentType !== ArrayType::Value) {
-                                throw new \Exception("The 'connect' key must be an associative array with the field names as keys and the data to create as values related ProductCategory model. example: ['connect' => ['id' => 'someId']]");
+                                throw new \Exception("The 'connect' key must be an associative array with the field names as keys and the data to create as values related items model. example: ['connect' => ['id' => 'someId']]");
                             }
                         }
 
@@ -1685,7 +1688,7 @@ class Category implements IModel
                             $checkArrayContentType = Utility::checkArrayContents($connectOrCreateData);
 
                             if (isset($relationDataName['connectOrCreate']) && $checkArrayContentType !== ArrayType::Associative) {
-                                throw new \Exception("The 'connectOrCreate' key must be an associative array with the field names as keys and the data to create as values related ProductCategory model. example: ['connectOrCreate' => ['where' => ['id' => 'someId'], 'create' => ['name' => 'someName']]");
+                                throw new \Exception("The 'connectOrCreate' key must be an associative array with the field names as keys and the data to create as values related items model. example: ['connectOrCreate' => ['where' => ['id' => 'someId'], 'create' => ['name' => 'someName']]");
                             }
                         }
 
@@ -1696,7 +1699,7 @@ class Category implements IModel
                                 $checkArrayContentType = Utility::checkArrayContents($disconnectData);
 
                                 if (isset($relationDataName['disconnect']) && $checkArrayContentType !== ArrayType::Value) {
-                                    throw new \Exception("The 'disconnect' key must be an associative array with the field names as keys and the data to create as values related ProductCategory model. example: ['disconnect' => ['id' => 'someId']]");
+                                    throw new \Exception("The 'disconnect' key must be an associative array with the field names as keys and the data to create as values related items model. example: ['disconnect' => ['id' => 'someId']]");
                                 }
                             }
                         }
@@ -1803,7 +1806,7 @@ class Category implements IModel
             Utility::processConditions($where, $whereClauses, $bindings, $this->_dbType);
 
             $dbType = $this->_dbType;
-            $quotedTableName = $dbType == 'pgsql' ? "\"Category\"" : "`Category`";
+            $quotedTableName = $dbType == 'pgsql' ? "\"Cart\"" : "`Cart`";
             $sql = "DELETE FROM $quotedTableName WHERE ";
             $sql .= implode(' AND ', $whereClauses);
 
@@ -1968,7 +1971,7 @@ class Category implements IModel
         $acceptedCriteria = ['_avg', '_count', '_max', '_min', '_sum', 'cursor', 'orderBy', 'skip', 'take', 'where'];
         Utility::checkForInvalidKeys($operation, $acceptedCriteria, $this->_modelName);
 
-        $quotedTableName = $this->_dbType == 'pgsql' ? "\"Category\"" : "`Category`";
+        $quotedTableName = $this->_dbType == 'pgsql' ? "\"Cart\"" : "`Cart`";
         $conditions = [];
         $bindings = [];
 
@@ -2041,7 +2044,7 @@ class Category implements IModel
     }
 
     /**
-     * Groups records in the 'Category' table and performs aggregate operations.
+     * Groups records in the 'Cart' table and performs aggregate operations.
      * 
      * @param array $criteria Array specifying the fields to group by.
      * @param array $aggregates Array specifying the aggregate operations (e.g., COUNT, SUM).
@@ -2052,7 +2055,7 @@ class Category implements IModel
     {
         $aggregates = $criteria['aggregates'] ?? [];
         $dbType = $this->_pdo->getAttribute(\PDO::ATTR_DRIVER_NAME);
-        $quotedTableName = $dbType == 'pgsql' ? "\"Category\"" : "`Category`";
+        $quotedTableName = $dbType == 'pgsql' ? "\"Cart\"" : "`Cart`";
         $groupByFields = implode(', ', $criteria);
         $aggregateFields = array_map(fn($a) => "{$a['function']}({$a['field']}) AS {$a['alias']}", $aggregates);
         $sql = "SELECT $groupByFields, " . implode(', ', $aggregateFields) . " FROM $quotedTableName GROUP BY $groupByFields";
@@ -2088,7 +2091,7 @@ class Category implements IModel
     public function updateMany(array $data, bool $format = false): array | object
     {
         if (!isset($data['where'])) {
-            throw new \Exception("The 'where' key is required in the updateMany Category.");
+            throw new \Exception("The 'where' key is required in the updateMany Cart.");
         }
 
         if (!is_array($data['where'])) {
@@ -2096,7 +2099,7 @@ class Category implements IModel
         }
 
         if (!isset($data['data'])) {
-            throw new \Exception("The 'data' key is required in the updateMany Category.");
+            throw new \Exception("The 'data' key is required in the updateMany Cart.");
         }
 
         if (!is_array($data['data'])) {
@@ -2111,12 +2114,12 @@ class Category implements IModel
         }
 
         $requiredFieldsMap = [
-            'name' => 'String',
+            'userId' => 'String',
         ];
         foreach ($data['data'] as $item) {
             foreach ($requiredFieldsMap as $fieldName => $fieldType) {
                 if (isset($item[$fieldName]) && empty($item[$fieldName])) {
-                    throw new \Exception("The '$fieldName' field of type '$fieldType' is required in Category Model.");
+                    throw new \Exception("The '$fieldName' field of type '$fieldType' is required in Cart Model.");
                 }
             }
         }
@@ -2133,7 +2136,7 @@ class Category implements IModel
             Utility::checkFieldsExist($fieldsToReview, $this->_fields, $this->_modelName);
 
             $dbType = $this->_dbType;
-            $quotedTableName = $dbType == 'pgsql' ? "\"Category\"" : "`Category`";
+            $quotedTableName = $dbType == 'pgsql' ? "\"Cart\"" : "`Cart`";
             $sql = "UPDATE $quotedTableName SET ";
             $updateFields = [];
             $bindings = [];
@@ -2169,7 +2172,7 @@ class Category implements IModel
                         $whereClauses[] = "$fieldName = :where_$fieldName";
                         $bindings[":where_$fieldName"] = $fieldValue;
                     } else {
-                        throw new \Exception("The '$fieldName' field does not exist in the Category model.");
+                        throw new \Exception("The '$fieldName' field does not exist in the Cart model.");
                     }
                 }
 
@@ -2250,7 +2253,7 @@ class Category implements IModel
             $this->_pdo->beginTransaction();
             $where = $criteria['where'];
             $dbType = $this->_dbType;
-            $quotedTableName = $dbType === 'pgsql' ? "\"Category\"" : "`Category`";
+            $quotedTableName = $dbType === 'pgsql' ? "\"Cart\"" : "`Cart`";
             $sql = "DELETE FROM $quotedTableName WHERE ";
             $whereClauses = [];
             $bindings = [];
@@ -2308,7 +2311,7 @@ class Category implements IModel
         $where = $criteria['where'] ?? [];
         $select = $criteria['select'] ?? [];
         $dbType = $this->_dbType;
-        $quotedTableName = $dbType === 'pgsql' ? "\"Category\"" : "`Category`";
+        $quotedTableName = $dbType === 'pgsql' ? "\"Cart\"" : "`Cart`";
         
         $selectedFields = 'COUNT(*)';
         if (!empty($select)) {

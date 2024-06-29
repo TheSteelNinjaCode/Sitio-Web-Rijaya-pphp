@@ -13,5 +13,12 @@
   "prisma": true,
   "docker": false,
   "version": "1.15.29",
-  "excludeFiles": []
+  "excludeFiles": [
+    ".env",
+    "/prisma/schema.prisma",
+    "/prisma/seed.js",
+    "/src/app/index.php",
+    "/src/app/layout.php",
+    "/src/app/metadata.php"
+  ]
 }
