@@ -1,0 +1,76 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id            String    @id @default(cuid())
+  name          String?
+  email         String?   @unique
+  password      String?
+  emailVerified DateTime?
+  image         String?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  roleId   Int?
+  userRole UserRole? @relation(fields: [roleId], references: [id])
+
+  @@map("Users")
+}
+
+model UserRole {
+  id   Int    @id @default(autoincrement())
+  name String @unique
+
+  user User[]
+}
+
+model Product {
+  id              String            @id @default(cuid())
+  name            String
+  description     String?
+  price           Float
+  createdAt       DateTime          @default(now())
+  updatedAt       DateTime          @updatedAt
+  categories      Category[]
+  ProductCategory ProductCategory[]
+  ProductImage    ProductImage[]
+}
+
+model ProductImage {
+  id        String   @id @default(cuid())
+  image     String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  productId String
+  product   Product @relation(fields: [productId], references: [id])
+}
+
+model Category {
+  id              String            @id @default(cuid())
+  name            String
+  description     String?
+  image           String?
+  products        Product[]
+  createdAt       DateTime          @default(now())
+  updatedAt       DateTime          @updatedAt
+  ProductCategory ProductCategory[]
+}
+
+model ProductCategory {
+  productId  String
+  categoryId String
+  product    Product  @relation(fields: [productId], references: [id])
+  category   Category @relation(fields: [categoryId], references: [id])
+
+  @@id([productId, categoryId])
+}

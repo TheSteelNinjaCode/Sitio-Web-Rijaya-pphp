@@ -1,0 +1,17 @@
+{
+  "projectName": "Sitio-Web-Rijaya-pphp",
+  "projectRootPath": "C:\\xampp\\htdocs\\projects\\Sitio-Web-Rijaya\\Sitio-Web-Rijaya-pphp",
+  "phpEnvironment": "XAMPP",
+  "phpRootPathExe": "C:\\xampp\\php\\php.exe",
+  "phpGenerateClassPath": "src/Lib/Prisma/Classes",
+  "bsTarget": "http://localhost/projects/Sitio-Web-Rijaya/Sitio-Web-Rijaya-pphp/",
+  "bsPathRewrite": {
+    "^/": "/projects/Sitio-Web-Rijaya/Sitio-Web-Rijaya-pphp/"
+  },
+  "tailwindcss": false,
+  "websocket": false,
+  "prisma": true,
+  "docker": false,
+  "version": "1.15.29",
+  "excludeFiles": []
+}
