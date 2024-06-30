@@ -19,6 +19,7 @@
 
 <body>
     <!-- Additional HTML content can go here. -->
+    <?php require_once APP_PATH . '/_components/navbar.php'; ?>
     <?php echo $content; ?>
     <?php require_once APP_PATH . '/_components/footer.php'; ?>
     <!-- Additional HTML content can go here. -->

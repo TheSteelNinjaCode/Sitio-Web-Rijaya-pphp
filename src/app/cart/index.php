@@ -1,15 +1,10 @@
-<?php require_once APP_PATH . '/_components/navbar.php' ?>
-
-<!--------------Cart Items details--------------->
 <div class="small-container cart-page">
-
     <table>
         <tr>
             <th>Producto</th>
             <th>Cantidad</th>
             <th>Subtotal</th>
         </tr>
-
         <tr>
             <td>
                 <div class="cart-info">

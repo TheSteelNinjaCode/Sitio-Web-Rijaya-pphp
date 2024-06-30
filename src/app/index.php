@@ -20,10 +20,6 @@ $lastProducts = $prisma->product->findMany([
 
 ?>
 
-<div class="header">
-    <?php require_once APP_PATH . '/_components/navbar.php'; ?>
-</div>
-
 <!------------------ featured categories --------------->
 <div class="categories">
     <div class="small-container">

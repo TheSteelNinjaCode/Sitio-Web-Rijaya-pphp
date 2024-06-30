@@ -48,9 +48,6 @@ function addToCart($product)
 
 ?>
 
-<?php require_once APP_PATH . '/_components/navbar.php'; ?>
-
-<!--------------single-product--------------->
 <div class="small-container single-product">
     <div class="row">
         <div class="col-2">

@@ -29,9 +29,6 @@ function paginate($data)
 
 ?>
 
-<?php require_once APP_PATH . '/_components/navbar.php'; ?>
-
-<!----------------- title -------------->
 <div class="small-container">
     <div class="row row-2">
         <h2>Todos los productos</h2>

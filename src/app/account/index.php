@@ -119,8 +119,6 @@ function registerUser($data)
 
 ?>
 
-<?php require_once APP_PATH . '/_components/navbar.php' ?>
-
 <div class="accout-page">
     <div class="container">
 
