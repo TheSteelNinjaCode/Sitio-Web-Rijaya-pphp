@@ -53,5 +53,6 @@
     ".\/src\/app\\products\\index.php",
     ".\/src\/app\\products\\[id]\\index.php",
     ".\/src\/app\\_components\\footer.php",
-    ".\/src\/app\\_components\\navbar.php"
+    ".\/src\/app\\_components\\navbar.php",
+    ".\/src\/app\\_components\\shared-navbar.php"
 ]

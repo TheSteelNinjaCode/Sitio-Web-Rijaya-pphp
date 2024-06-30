@@ -13,7 +13,8 @@ if ($auth->isAuthenticated()) {
     redirect('/');
 }
 
-$message = $state->getState('message');
+$loginMessage = $state->getState('loginMessage');
+$registerMessage = $state->getState('registerMessage');
 $username = $state->getState('username');
 $email = $state->getState('email');
 $password = $state->getState('password');
@@ -29,7 +30,7 @@ function loginUser($data)
     $state->setState('password', $password);
 
     if (!Validator::string($username)) {
-        $state->setState('message', 'El nombre de usuario es requerido');
+        $state->setState('loginMessage', 'El nombre de usuario es requerido');
         return;
     }
 
@@ -42,10 +43,10 @@ function loginUser($data)
             $auth->authenticate($user);
             redirect('/');
         } else {
-            $state->setState('message', 'Contraseña incorrecta');
+            $state->setState('loginMessage', 'Contraseña incorrecta');
         }
     } else {
-        $state->setState('message', 'Usuario no encontrado');
+        $state->setState('loginMessage', 'Usuario no encontrado');
     }
 }
 
@@ -62,17 +63,17 @@ function registerUser($data)
     $state->setState('password', $password);
 
     if (!Validator::string($username)) {
-        $state->setState('message', 'El nombre de usuario es requerido');
+        $state->setState('registerMessage', 'El nombre de usuario es requerido');
         return;
     }
 
     if (!Validator::email($email)) {
-        $state->setState('message', 'El correo electrónico es requerido');
+        $state->setState('registerMessage', 'El correo electrónico es requerido');
         return;
     }
 
     if (!Validator::string($password)) {
-        $state->setState('message', 'La contraseña es requerida');
+        $state->setState('registerMessage', 'La contraseña es requerida');
         return;
     }
 
@@ -81,7 +82,7 @@ function registerUser($data)
     ], true);
 
     if ($user) {
-        $state->setState('message', 'El nombre de usuario ya existe');
+        $state->setState('registerMessage', 'El nombre de usuario ya existe');
         return;
     }
 
@@ -90,7 +91,7 @@ function registerUser($data)
     ], true);
 
     if ($user) {
-        $state->setState('message', 'El correo electrónico ya existe');
+        $state->setState('registerMessage', 'El correo electrónico ya existe');
         return;
     }
 
@@ -111,9 +112,9 @@ function registerUser($data)
         $state->setState('username', '');
         $state->setState('email', '');
         $state->setState('password', '');
-        $state->setState('message', 'Usuario registrado correctamente');
+        $state->setState('registerMessage', 'Usuario registrado correctamente');
     } else {
-        $state->setState('message', 'Error al registrar el usuario');
+        $state->setState('registerMessage', 'Error al registrar el usuario');
     }
 }
 
@@ -121,13 +122,10 @@ function registerUser($data)
 
 <div class="accout-page">
     <div class="container">
-
         <div class="row">
-
             <div class="col-2">
                 <img src="<?php echo $baseUrl; ?>assets/images/silla az.png" width="80%">
             </div>
-
             <div class="col-2">
                 <div class="form-container">
                     <div class="form-btn">
@@ -137,18 +135,18 @@ function registerUser($data)
                     </div>
 
                     <form id="LoginForm" onsubmit="loginUser">
-                        <span><?= $message ?></span> <!-- Ajustar el mensaje de error -->
+                        <span><?= $loginMessage ?></span> <!-- Ajustar el mensaje de error -->
                         <input type="text" name="username" placeholder="username" value="<?= $username ?>">
                         <input type="password" name="password" placeholder="Password" value="<?= $password ?>">
                         <button type="submit" class="btn">Login
                             <span></span>
                             <span></span>
                         </button>
-                        <a href="/forgot-password">Forgot password</a>
+                        <a href="">Forgot password</a>
                     </form>
 
                     <form id="RegForm" onsubmit="registerUser">
-                        <span><?= $message ?></span> <!-- Ajustar el mensaje de error -->
+                        <span><?= $registerMessage ?></span> <!-- Ajustar el mensaje de error -->
                         <input type="text" name="username" placeholder="username" value="<?= $username ?>">
                         <input type="email" name="email" placeholder="Email" value="<?= $email ?>">
                         <input type="password" name="password" placeholder="Password" value="<?= $password ?>">
