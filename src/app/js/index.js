@@ -331,6 +331,34 @@ function updateDocumentContent(data) {
     headScripts.forEach((script) => document.head.appendChild(script));
     // Append and execute the extracted body scripts
     bodyScripts.forEach((script) => document.body.appendChild(script));
+  } else {
+    saveState();
+    const scrollPositions = saveScrollPositions();
+    const parser = new DOMParser();
+    const newDoc = parser.parseFromString(data, "text/html");
+    const scripts = Array.from(newDoc.body.querySelectorAll("script"));
+    const styles = Array.from(newDoc.head.querySelectorAll("style"));
+    const newBody = newDoc.body;
+    diffAndPatch(document.body, newBody);
+    restoreState();
+    restoreScrollPositions(scrollPositions);
+    // Load styles
+    styles.forEach((style) => {
+      const newStyle = document.createElement("style");
+      newStyle.textContent = style.textContent;
+      document.head.appendChild(newStyle);
+    });
+    // Load scripts
+    scripts.forEach((script) => {
+      if (script.src) {
+        loadScript(script.src);
+      } else {
+        const newScript = document.createElement("script");
+        newScript.textContent = script.textContent;
+        document.body.appendChild(newScript);
+        document.body.removeChild(newScript);
+      }
+    });
   }
   attachWireFunctionEvents();
 }
