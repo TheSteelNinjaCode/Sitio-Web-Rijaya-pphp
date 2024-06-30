@@ -4,7 +4,7 @@ use Lib\Auth\Auth;
 
 $auth = new Auth();
 
-$userName = $auth->getPayload()->name ?? 'Invitado';
+$userName = $auth->getPayload()->name ?? '';
 
 function logout()
 {
@@ -26,13 +26,16 @@ function logout()
                 <li><a href="/products">Productos</a></li>
                 <li><a href="/acerca-de">Acerca de</a></li>
                 <li><a href="/contacto">Contacto</a></li>
-                <li><a href="/account">Cuenta</a></li>
+                <?php if (!$auth->isAuthenticated()) : ?>
+                    <li><a href="/account">Mi cuenta</a></li>
+                <?php else : ?>
+                    <li><span><?= $userName ?></span></li>
+                    <?php if ($auth->isAuthenticated()) : ?>
+                        <li><button onclick="logout">Cerrar sesión</button></li>
+                    <?php endif; ?>
+                <?php endif; ?>
             </ul>
         </nav>
-        <span><?= $userName ?></span> <!-- Ajustar el userName para que muestre el nombre del usuario autenticado -->
-        <?php if ($auth->isAuthenticated()) : ?>
-            <button onclick="logout">Cerrar sesión</button>
-        <?php endif; ?>
         <a href="/cart"><img src="<?php echo $baseUrl; ?>assets/images/cart.png" width="30px" height="30px"></a>
         <img src="<?php echo $baseUrl; ?>assets/images/menu.png" onclick="menutoggle()" class="menu-icon">
     </div>

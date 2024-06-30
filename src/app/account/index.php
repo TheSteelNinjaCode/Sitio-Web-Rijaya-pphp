@@ -7,6 +7,11 @@ use Lib\Validator;
 
 $state = new StateManager();
 $prisma = new Prisma();
+$auth = new Auth();
+
+if ($auth->isAuthenticated()) {
+    redirect('/');
+}
 
 $message = $state->getState('message');
 $username = $state->getState('username');
@@ -15,8 +20,7 @@ $password = $state->getState('password');
 
 function loginUser($data)
 {
-    global $state, $prisma;
-    $auth = new Auth();
+    global $state, $prisma, $auth;
 
     $username = $data->username;
     $password = $data->password;
