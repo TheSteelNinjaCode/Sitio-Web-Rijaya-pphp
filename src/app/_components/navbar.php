@@ -1,3 +1,20 @@
+<?php
+
+use Lib\Auth\Auth;
+
+$auth = new Auth();
+
+$userName = $auth->getPayload()->name ?? 'Invitado';
+
+function logout()
+{
+    global $auth;
+    $auth->logout();
+    redirect('/');
+}
+
+?>
+
 <div class="container">
     <div class="navbar">
         <div class="logo">
@@ -12,6 +29,10 @@
                 <li><a href="/account">Cuenta</a></li>
             </ul>
         </nav>
+        <span><?= $userName ?></span> <!-- Ajustar el userName para que muestre el nombre del usuario autenticado -->
+        <?php if ($auth->isAuthenticated()) : ?>
+            <button onclick="logout">Cerrar sesión</button>
+        <?php endif; ?>
         <a href="/cart"><img src="<?php echo $baseUrl; ?>assets/images/cart.png" width="30px" height="30px"></a>
         <img src="<?php echo $baseUrl; ?>assets/images/menu.png" onclick="menutoggle()" class="menu-icon">
     </div>

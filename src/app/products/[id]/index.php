@@ -119,7 +119,7 @@ function addToCart($product)
                     <i class="fa fa-star"></i>
                     <i class="fa fa-star"></i>
                     <i class="fa fa-star"></i>
-                    <i class="fa fa-star-o"></i>
+                    <i class="fa <?php echo rand(0, 1) ? 'fa-star-half-o' : 'fa-star-o'; ?>"></i>
                 </div>
                 <p>$<?= $relatedProduct->product[0]->price ?></p>
             </div>

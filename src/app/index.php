@@ -51,7 +51,7 @@ $lastProducts = $prisma->product->findMany([
                     <i class="fa fa-star"></i>
                     <i class="fa fa-star"></i>
                     <i class="fa fa-star"></i>
-                    <i class="fa fa-star-o"></i>
+                    <i class="fa <?php echo rand(0, 1) ? 'fa-star-half-o' : 'fa-star-o'; ?>"></i>
                 </div>
                 <p>$<?= $featuredProduct->price ?></p>
             </div>
@@ -68,7 +68,7 @@ $lastProducts = $prisma->product->findMany([
                     <i class="fa fa-star"></i>
                     <i class="fa fa-star"></i>
                     <i class="fa fa-star"></i>
-                    <i class="fa fa-star-o"></i>
+                    <i class="fa <?php echo rand(0, 1) ? 'fa-star-half-o' : 'fa-star-o'; ?>"></i>
                 </div>
                 <p>$<?= $lastProduct->price ?></p>
             </div>

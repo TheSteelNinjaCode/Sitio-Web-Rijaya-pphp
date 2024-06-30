@@ -66,7 +66,7 @@ function paginate($data)
             <a href="<?= $pathname . '?page=' . $i ?>"><span><?= $i ?></span></a>
             <!-- <span onclick="paginate({'page': '<?= $i ?>'})"><?= $i ?></span> -->
         <?php endfor; ?>
-        <span href="<?= $pathname . '?page=' . $totalPages ?>">&#8594;</span>
+        <a href="<?= $pathname . '?page=' . $totalPages ?>"><span>&#8594;</span></a>
         <!-- <span onclick="paginate({'page': '<?= $totalPages ?>'})">&#8594;</span> -->
     </div>
 </div>
