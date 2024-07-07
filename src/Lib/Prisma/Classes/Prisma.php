@@ -37,7 +37,7 @@ class Prisma
         }
 
         $parsedUrl = parse_url($databaseUrl);
-        $dbProvider = $parsedUrl['scheme'] ?? '';
+        $dbProvider = strtolower($parsedUrl['scheme'] ?? '');
 
         if ($dbProvider === 'file' || $dbProvider === 'sqlite') {
             $dbRelativePath = ltrim($parsedUrl['path'], '/');
@@ -58,7 +58,7 @@ class Prisma
             $dbPassword = $matches[2] ?? '';
             $databaseUrlWithoutCredentials = preg_replace($pattern, '://', $databaseUrl);
             $parsedUrl = parse_url($databaseUrlWithoutCredentials);
-            $dbProvider = $parsedUrl['scheme'] ?? '';
+            $dbProvider = strtolower($parsedUrl['scheme'] ?? '');
             $dbName = isset($parsedUrl['path']) ? substr($parsedUrl['path'], 1) : '';
             $dbHost = $parsedUrl['host'] ?? '';
             $dbPort = $parsedUrl['port'] ?? ($dbProvider === 'mysql' ? 3306 : 5432);

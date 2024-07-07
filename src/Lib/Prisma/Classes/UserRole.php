@@ -102,28 +102,6 @@ class UserRole implements IModel
         }
     }
 
-    public function getId()
-    {
-        return $this->id;
-    }
-
-    public function setId($value)
-    {
-        $validatedValue = Validator::int($value);
-        $this->id = $validatedValue;
-    }
-
-    public function getName()
-    {
-        return $this->name;
-    }
-
-    public function setName($value)
-    {
-        $validatedValue = Validator::string($value);
-        $this->name = $validatedValue;
-    }
-
     protected function includeUser(array $items, array $selectedFields = [], array $includeSelectedFields = [], bool $format = false) 
     {
         if (empty($items)) {
@@ -150,13 +128,15 @@ class UserRole implements IModel
         $foreignKeyIds = array_filter($foreignKeyIds); // Filter out any empty values
         $foreignKeyIds = array_unique($foreignKeyIds);
 
-        $modelName = new User($this->_pdo);
+        $instanceModelName = new User($this->_pdo);
         foreach ($items as &$item) {
             if (!isset($item[$primaryKey])) {
                 $item[$relationName] = [];
                 continue;
             }
-            $relatedRecords = $modelName->findMany(['where' => [$foreignKey => $item[$primaryKey]], 'select' => $includeSelectedFields], $format);
+            $whereQuery = ['where' => [$foreignKey => $item[$primaryKey]]];
+            $mergeQuery = array_merge($whereQuery, $includeSelectedFields);
+            $relatedRecords = $instanceModelName->findMany($mergeQuery, $format);
             $item[$relationName] = $relatedRecords;
         }
 
@@ -358,6 +338,7 @@ class UserRole implements IModel
                 $isNullable = $field['isNullable'];
                 $relation = $field['decorators']['relation'] ?? null;
                 $inverseRelation = $field['decorators']['inverseRelation'] ?? null;
+                $implicitRelation = $field['decorators']['implicitRelation'] ?? null;
 
                 if (!empty($field['decorators']['id'])) {
                     $primaryKeyField = $fieldName;
@@ -376,12 +357,12 @@ class UserRole implements IModel
                     }
                 } elseif (isset($data[$fieldName]) || !$isNullable) {
                     if (!array_key_exists($fieldName, $data)) continue;
-                    if (isset($relation) || isset($inverseRelation)) continue;
+                    if (isset($relation) || isset($inverseRelation) || isset($implicitRelation)) continue;
                     $validateMethodName = lcfirst($fieldType);
                     $bindings[$fieldName] = Validator::$validateMethodName($data[$fieldName]);
                 } elseif (isset($data[$fieldName]) && $isNullable) {
                     if (!array_key_exists($fieldName, $data)) continue;
-                    if (isset($relation) || isset($inverseRelation)) continue;
+                    if (isset($relation) || isset($inverseRelation) || isset($implicitRelation)) continue;
                     $insertFields[] = $fieldName;
                     $placeholders[] = "NULL";
                 }
@@ -616,6 +597,7 @@ class UserRole implements IModel
                 $isNullable = $field['isNullable'];
                 $relation = $field['decorators']['relation'] ?? null;
                 $inverseRelation = $field['decorators']['inverseRelation'] ?? null;
+                $implicitRelation = $field['decorators']['implicitRelation'] ?? null;
     
                 if (!empty($field['decorators']['id'])) {
                     if (empty($item[$fieldName])) {
@@ -629,14 +611,14 @@ class UserRole implements IModel
                         $item[$fieldName] = Validator::$validateMethodName($data[$fieldName]);
                     }
                 } else if (isset($item[$fieldName]) || !$isNullable) {
-                    if (!array_key_exists($fieldName, $item)) continue;
+                    if (isset($relation) || isset($inverseRelation) || isset($implicitRelation)) continue;
                     if (isset($relation) || isset($inverseRelation)) {
                         throw new \Exception("The 'createMany' method does not support creating related records.");
                     }
                     $validateMethodName = lcfirst($fieldType);
                     $item[$fieldName] = Validator::$validateMethodName($item[$fieldName]);
                 } else if (isset($item[$fieldName]) && $isNullable) {
-                    if (!array_key_exists($fieldName, $item)) continue;
+                    if (isset($relation) || isset($inverseRelation) || isset($implicitRelation)) continue;
                     if (isset($relation) || isset($inverseRelation)) {
                         throw new \Exception("The 'createMany' method does not support creating related records.");
                     }
@@ -1296,19 +1278,20 @@ class UserRole implements IModel
                 $isNullable = $field['isNullable'];
                 $relation = $field['decorators']['relation'] ?? null;
                 $inverseRelation = $field['decorators']['inverseRelation'] ?? null;
+                $implicitRelation = $field['decorators']['implicitRelation'] ?? null;
                 if (!empty($field['decorators']['id'])) {
                     $primaryKeyField = $fieldName;
                 }
                 if (isset($data[$fieldName]) || !$isNullable) {
                     if (!array_key_exists($fieldName, $data)) continue;
-                    if (isset($relation) || isset($inverseRelation)) continue;
+                    if (isset($relation) || isset($inverseRelation) || isset($implicitRelation)) continue;
                     $validateMethodName = lcfirst($fieldType);
                     $validatedValue = Validator::$validateMethodName($data[$fieldName]);
                     $updateFields[] = $dbType == 'pgsql' ? "\"$fieldName\" = :$fieldName" : "`$fieldName` = :$fieldName";
                     $bindings[":$fieldName"] = $validatedValue;
                 } else {
                     if (array_key_exists($fieldName, $data) && $isNullable) {
-                        if (isset($relation) || isset($inverseRelation)) continue;
+                        if (isset($relation) || isset($inverseRelation) || isset($implicitRelation)) continue;
                         $updateFields[] = $dbType == 'pgsql' ? "\"$fieldName\" = NULL" : "`$fieldName` = NULL";
                     }
                 }
@@ -1319,12 +1302,34 @@ class UserRole implements IModel
 
                 if (!empty($where)) {
                     $whereClauses = [];
+
                     foreach ($where as $fieldName => $fieldValue) {
-                        if (array_key_exists($fieldName, $this->_fields)) {
-                            $whereClauses[] = "$fieldName = :where_$fieldName";
-                            $bindings[":where_$fieldName"] = $fieldValue;
+                        // Handle logical operators AND, OR, NOT
+                        if (in_array(strtoupper($fieldName), ['AND', 'OR', 'NOT'])) {
+                            if (is_array($fieldValue)) {
+                                $subClauses = [];
+                                foreach ($fieldValue as $subField => $subValue) {
+                                    if (array_key_exists($subField, $this->_fields)) {
+                                        $subClauses[] = "$subField = :where_$subField";
+                                        $bindings[":where_$subField"] = $subValue;
+                                    } else {
+                                        throw new \Exception("The '$subField' field does not exist in the UserRole model.");
+                                    }
+                                }
+
+                                $operator = strtoupper($fieldName);
+                                $whereClauses[] = $operator . ' (' . implode(' AND ', $subClauses) . ')';
+                            } else {
+                                throw new \Exception("The '$fieldName' operator must be followed by an array of conditions.");
+                            }
                         } else {
-                            throw new \Exception("The '$fieldName' field does not exist in the UserRole model.");
+                            // Normal field check
+                            if (array_key_exists($fieldName, $this->_fields)) {
+                                $whereClauses[] = "$fieldName = :where_$fieldName";
+                                $bindings[":where_$fieldName"] = $fieldValue;
+                            } else {
+                                throw new \Exception("The '$fieldName' field does not exist in the UserRole model.");
+                            }
                         }
                     }
 
@@ -1880,17 +1885,18 @@ class UserRole implements IModel
                 $isNullable = $field['isNullable'];
                 $relation = $field['decorators']['relation'] ?? null;
                 $inverseRelation = $field['decorators']['inverseRelation'] ?? null;
+                $implicitRelation = $field['decorators']['implicitRelation'] ?? null;
 
                 if (isset($dataToUpdate[$fieldName]) || !$isNullable) {
                     if (!array_key_exists($fieldName, $dataToUpdate)) continue;
-                    if (isset($relation) || isset($inverseRelation)) continue;
+                    if (isset($relation) || isset($inverseRelation) || isset($implicitRelation)) continue;
                     $validateMethodName = lcfirst($fieldType);
                     $validatedValue = Validator::$validateMethodName($dataToUpdate[$fieldName]);
                     $updateFields[] = "$fieldName = :$fieldName";
                     $bindings[":$fieldName"] = $validatedValue;
                 } else {
                     if (array_key_exists($fieldName, $dataToUpdate) && $isNullable) {
-                        if (isset($relation) || isset($inverseRelation)) continue;
+                        if (isset($relation) || isset($inverseRelation) || isset($implicitRelation)) continue;
                         $updateFields[] = "$fieldName = NULL";
                     }
                 }
@@ -1899,20 +1905,42 @@ class UserRole implements IModel
             $sql .= implode(', ', $updateFields);
 
             if (!empty($where)) {
-                $whereClauses = [];
-                foreach ($where as $fieldName => $fieldValue) {
-                    if (array_key_exists($fieldName, $this->_fields)) {
-                        $whereClauses[] = "$fieldName = :where_$fieldName";
-                        $bindings[":where_$fieldName"] = $fieldValue;
-                    } else {
-                        throw new \Exception("The '$fieldName' field does not exist in the UserRole model.");
+                    $whereClauses = [];
+
+                    foreach ($where as $fieldName => $fieldValue) {
+                        // Handle logical operators AND, OR, NOT
+                        if (in_array(strtoupper($fieldName), ['AND', 'OR', 'NOT'])) {
+                            if (is_array($fieldValue)) {
+                                $subClauses = [];
+                                foreach ($fieldValue as $subField => $subValue) {
+                                    if (array_key_exists($subField, $this->_fields)) {
+                                        $subClauses[] = "$subField = :where_$subField";
+                                        $bindings[":where_$subField"] = $subValue;
+                                    } else {
+                                        throw new \Exception("The '$subField' field does not exist in the UserRole model.");
+                                    }
+                                }
+
+                                $operator = strtoupper($fieldName);
+                                $whereClauses[] = $operator . ' (' . implode(' AND ', $subClauses) . ')';
+                            } else {
+                                throw new \Exception("The '$fieldName' operator must be followed by an array of conditions.");
+                            }
+                        } else {
+                            // Normal field check
+                            if (array_key_exists($fieldName, $this->_fields)) {
+                                $whereClauses[] = "$fieldName = :where_$fieldName";
+                                $bindings[":where_$fieldName"] = $fieldValue;
+                            } else {
+                                throw new \Exception("The '$fieldName' field does not exist in the UserRole model.");
+                            }
+                        }
+                    }
+
+                    if (!empty($whereClauses)) {
+                        $sql .= " WHERE " . implode(' AND ', $whereClauses);
                     }
                 }
-
-                if (!empty($whereClauses)) {
-                    $sql .= " WHERE " . implode(' AND ', $whereClauses);
-                }
-            }
 
             $stmt = $this->_pdo->prepare($sql);
             foreach ($bindings as $key => $value) {

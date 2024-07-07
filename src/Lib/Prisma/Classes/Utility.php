@@ -116,8 +116,9 @@ abstract class Utility
                     foreach ($fields as $field) {
                         $relation = $field['decorators']['relation'] ?? null;
                         $inverseRelation = $field['decorators']['inverseRelation'] ?? null;
+                        $implicitRelation = $field['decorators']['implicitRelation'] ?? null;
 
-                        if (isset($relation['name']) && $relation['name'] == $key || isset($inverseRelation['fromField']) && $inverseRelation['fromField'] == $key) $isRelatedModel = true;
+                        if (isset($relation['name']) && $relation['name'] == $key || isset($inverseRelation['fromField']) && $inverseRelation['fromField'] == $key || isset($implicitRelation['fromField']) && $implicitRelation['fromField'] == $key) $isRelatedModel = true;
                     }
 
                     if ($isRelatedModel) continue;
@@ -211,6 +212,11 @@ abstract class Utility
                 $groupedConditions = [];
                 if ($key === 'NOT') {
                     self::processNotCondition($value, $groupedConditions, $bindings, $dbType, $prefix . $key . '_', $level);
+                    if (!empty($groupedConditions)) {
+                        $conditionGroup = '(' . implode(" $key ", $groupedConditions) . ')';
+                        $conditionGroup = 'NOT ' . $conditionGroup;
+                        $sqlConditions[] = $conditionGroup;
+                    }
                 } else {
                     foreach ($value as $conditionKey => $subCondition) {
                         if (is_numeric($conditionKey)) {
@@ -223,13 +229,6 @@ abstract class Utility
                         $conditionGroup = '(' . implode(" $key ", $groupedConditions) . ')';
                         $sqlConditions[] = $conditionGroup;
                     }
-                }
-                if (!empty($groupedConditions)) {
-                    $conditionGroup = '(' . implode(" $key ", $groupedConditions) . ')';
-                    if ($key === 'NOT') {
-                        $conditionGroup = 'NOT ' . $conditionGroup;
-                    }
-                    $sqlConditions[] = $conditionGroup;
                 }
             } else {
                 self::processSingleCondition($key, $value, $sqlConditions, $bindings, $dbType, $prefix, $level);

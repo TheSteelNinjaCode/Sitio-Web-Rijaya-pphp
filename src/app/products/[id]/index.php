@@ -16,6 +16,10 @@ if (!empty($id)) {
         'include' => ['ProductImage' => true, 'ProductCategory' => true],
     ], true);
 
+    // echo "<pre>";
+    // print_r($product);
+    // echo "</pre>";
+
     if ($product) {
         $relatedProducts = $prisma->productCategory->findMany([
             'where' => [
@@ -39,11 +43,12 @@ if (!empty($id)) {
     exit;
 }
 
-function addToCart($product)
+function addToCart($data)
 {
-    $cart = $_SESSION['cart'] ?? [];
-    $cart[] = $product;
-    $_SESSION['cart'] = $cart;
+    return $data;
+    // $cart = $_SESSION['cart'] ?? [];
+    // $cart[] = $product;
+    // $_SESSION['cart'] = $cart;
 }
 
 ?>
@@ -79,11 +84,13 @@ function addToCart($product)
                 <option></option>
             </select>
 
-            <input type="number" value="1">
-            <a href="/cart" class="btn">Añadir al carrito
+            <form id="add-to-cart" onsubmit="addToCart">
+                <input type="number" value="1">
+            </form>
+            <button form="add-to-cart" class="btn">Añadir al carrito
                 <span></span>
                 <span></span>
-            </a>
+            </button>
 
             <h3>Detalles del producto<i class="fa fa-indent"></i></h3>
             <br>
@@ -124,7 +131,6 @@ function addToCart($product)
     </div>
 </div>
 
-<!-------------js for toggle menu-------------->
 <script>
     //-------------Produc Gallery------------
     var ProductImg = document.getElementById("ProductImg");

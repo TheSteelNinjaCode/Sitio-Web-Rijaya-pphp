@@ -228,105 +228,6 @@ class User implements IModel
         }
     }
 
-    public function getId()
-    {
-        return $this->id;
-    }
-
-    public function setId($value)
-    {
-        $validatedValue = Validator::string($value);
-        $this->id = $validatedValue;
-    }
-
-    public function getName()
-    {
-        return $this->name;
-    }
-
-    public function setName($value)
-    {
-        $validatedValue = Validator::string($value);
-        $this->name = $validatedValue;
-    }
-
-    public function getEmail()
-    {
-        return $this->email;
-    }
-
-    public function setEmail($value)
-    {
-        $validatedValue = Validator::string($value);
-        $this->email = $validatedValue;
-    }
-
-    public function getPassword()
-    {
-        return $this->password;
-    }
-
-    public function setPassword($value)
-    {
-        $validatedValue = Validator::string($value);
-        $this->password = $validatedValue;
-    }
-
-    public function getEmailVerified()
-    {
-        return $this->emailVerified;
-    }
-
-    public function setEmailVerified($value)
-    {
-        $validatedValue = Validator::dateTime($value);
-        $this->emailVerified = $validatedValue;
-    }
-
-    public function getImage()
-    {
-        return $this->image;
-    }
-
-    public function setImage($value)
-    {
-        $validatedValue = Validator::string($value);
-        $this->image = $validatedValue;
-    }
-
-    public function getCreatedAt()
-    {
-        return $this->createdAt;
-    }
-
-    public function setCreatedAt($value)
-    {
-        $validatedValue = Validator::dateTime($value);
-        $this->createdAt = $validatedValue;
-    }
-
-    public function getUpdatedAt()
-    {
-        return $this->updatedAt;
-    }
-
-    public function setUpdatedAt($value)
-    {
-        $validatedValue = Validator::dateTime($value);
-        $this->updatedAt = $validatedValue;
-    }
-
-    public function getRoleId()
-    {
-        return $this->roleId;
-    }
-
-    public function setRoleId($value)
-    {
-        $validatedValue = Validator::int($value);
-        $this->roleId = $validatedValue;
-    }
-
     protected function includeUserRole(array $items, array $selectedFields = [], array $includeSelectedFields = [], bool $format = false) 
     {
         if (empty($items)) {
@@ -378,27 +279,16 @@ class User implements IModel
         }
 
         if (!empty($foreignKeyIds)) {
-            $tableModelName = new UserRole($this->_pdo);
-            $isSelectOrInclude = !empty($selectedFields) ? 'select' : 'include';
-            $selectOrIncludeValues = $isSelectOrInclude === 'select' ? $selectedFields : $includeSelectedFields;
-
+            $instanceModelName = new UserRole($this->_pdo);
             foreach ($items as &$item) {
                 if (!isset($item[$foreignKey])) {
                     $item[$relationName] = [];
                     continue;
                 }
 
-                $queryParams = ['where' => [$primaryKey => $item[$foreignKey]]];
-
-                foreach ($selectOrIncludeValues as $key => $value) {
-                    if (is_int($key)) {
-                        $queryParams = array_merge($queryParams, $value);
-                    } else {
-                        $queryParams[$key] = $value;
-                    }
-                }
-
-                $relatedRecords = $tableModelName->findMany($queryParams, $format);
+                $whereQuery = ['where' => [$primaryKey => $item[$foreignKey]]];
+                $mergeQuery = array_merge($whereQuery, $includeSelectedFields);
+                $relatedRecords = $instanceModelName->findMany($mergeQuery, $format);
                 $item[$relationName] = $relatedRecords;
 
                 if ($wasEmpty && isset($item[$foreignKey])) {
@@ -531,13 +421,15 @@ class User implements IModel
         $foreignKeyIds = array_filter($foreignKeyIds); // Filter out any empty values
         $foreignKeyIds = array_unique($foreignKeyIds);
 
-        $modelName = new Cart($this->_pdo);
+        $instanceModelName = new Cart($this->_pdo);
         foreach ($items as &$item) {
             if (!isset($item[$primaryKey])) {
                 $item[$relationName] = [];
                 continue;
             }
-            $relatedRecords = $modelName->findMany(['where' => [$foreignKey => $item[$primaryKey]], 'select' => $includeSelectedFields], $format);
+            $whereQuery = ['where' => [$foreignKey => $item[$primaryKey]]];
+            $mergeQuery = array_merge($whereQuery, $includeSelectedFields);
+            $relatedRecords = $instanceModelName->findMany($mergeQuery, $format);
             $item[$relationName] = $relatedRecords;
         }
 
@@ -732,6 +624,7 @@ class User implements IModel
                 $isNullable = $field['isNullable'];
                 $relation = $field['decorators']['relation'] ?? null;
                 $inverseRelation = $field['decorators']['inverseRelation'] ?? null;
+                $implicitRelation = $field['decorators']['implicitRelation'] ?? null;
 
                 if (!empty($field['decorators']['id'])) {
                     $primaryKeyField = $fieldName;
@@ -750,12 +643,12 @@ class User implements IModel
                     }
                 } elseif (isset($data[$fieldName]) || !$isNullable) {
                     if (!array_key_exists($fieldName, $data)) continue;
-                    if (isset($relation) || isset($inverseRelation)) continue;
+                    if (isset($relation) || isset($inverseRelation) || isset($implicitRelation)) continue;
                     $validateMethodName = lcfirst($fieldType);
                     $bindings[$fieldName] = Validator::$validateMethodName($data[$fieldName]);
                 } elseif (isset($data[$fieldName]) && $isNullable) {
                     if (!array_key_exists($fieldName, $data)) continue;
-                    if (isset($relation) || isset($inverseRelation)) continue;
+                    if (isset($relation) || isset($inverseRelation) || isset($implicitRelation)) continue;
                     $insertFields[] = $fieldName;
                     $placeholders[] = "NULL";
                 }
@@ -983,6 +876,7 @@ class User implements IModel
                 $isNullable = $field['isNullable'];
                 $relation = $field['decorators']['relation'] ?? null;
                 $inverseRelation = $field['decorators']['inverseRelation'] ?? null;
+                $implicitRelation = $field['decorators']['implicitRelation'] ?? null;
     
                 if (!empty($field['decorators']['id'])) {
                     if (empty($item[$fieldName])) {
@@ -996,14 +890,14 @@ class User implements IModel
                         $item[$fieldName] = Validator::$validateMethodName($data[$fieldName]);
                     }
                 } else if (isset($item[$fieldName]) || !$isNullable) {
-                    if (!array_key_exists($fieldName, $item)) continue;
+                    if (isset($relation) || isset($inverseRelation) || isset($implicitRelation)) continue;
                     if (isset($relation) || isset($inverseRelation)) {
                         throw new \Exception("The 'createMany' method does not support creating related records.");
                     }
                     $validateMethodName = lcfirst($fieldType);
                     $item[$fieldName] = Validator::$validateMethodName($item[$fieldName]);
                 } else if (isset($item[$fieldName]) && $isNullable) {
-                    if (!array_key_exists($fieldName, $item)) continue;
+                    if (isset($relation) || isset($inverseRelation) || isset($implicitRelation)) continue;
                     if (isset($relation) || isset($inverseRelation)) {
                         throw new \Exception("The 'createMany' method does not support creating related records.");
                     }
@@ -1656,19 +1550,20 @@ class User implements IModel
                 $isNullable = $field['isNullable'];
                 $relation = $field['decorators']['relation'] ?? null;
                 $inverseRelation = $field['decorators']['inverseRelation'] ?? null;
+                $implicitRelation = $field['decorators']['implicitRelation'] ?? null;
                 if (!empty($field['decorators']['id'])) {
                     $primaryKeyField = $fieldName;
                 }
                 if (isset($data[$fieldName]) || !$isNullable) {
                     if (!array_key_exists($fieldName, $data)) continue;
-                    if (isset($relation) || isset($inverseRelation)) continue;
+                    if (isset($relation) || isset($inverseRelation) || isset($implicitRelation)) continue;
                     $validateMethodName = lcfirst($fieldType);
                     $validatedValue = Validator::$validateMethodName($data[$fieldName]);
                     $updateFields[] = $dbType == 'pgsql' ? "\"$fieldName\" = :$fieldName" : "`$fieldName` = :$fieldName";
                     $bindings[":$fieldName"] = $validatedValue;
                 } else {
                     if (array_key_exists($fieldName, $data) && $isNullable) {
-                        if (isset($relation) || isset($inverseRelation)) continue;
+                        if (isset($relation) || isset($inverseRelation) || isset($implicitRelation)) continue;
                         $updateFields[] = $dbType == 'pgsql' ? "\"$fieldName\" = NULL" : "`$fieldName` = NULL";
                     }
                 }
@@ -1679,12 +1574,34 @@ class User implements IModel
 
                 if (!empty($where)) {
                     $whereClauses = [];
+
                     foreach ($where as $fieldName => $fieldValue) {
-                        if (array_key_exists($fieldName, $this->_fields)) {
-                            $whereClauses[] = "$fieldName = :where_$fieldName";
-                            $bindings[":where_$fieldName"] = $fieldValue;
+                        // Handle logical operators AND, OR, NOT
+                        if (in_array(strtoupper($fieldName), ['AND', 'OR', 'NOT'])) {
+                            if (is_array($fieldValue)) {
+                                $subClauses = [];
+                                foreach ($fieldValue as $subField => $subValue) {
+                                    if (array_key_exists($subField, $this->_fields)) {
+                                        $subClauses[] = "$subField = :where_$subField";
+                                        $bindings[":where_$subField"] = $subValue;
+                                    } else {
+                                        throw new \Exception("The '$subField' field does not exist in the User model.");
+                                    }
+                                }
+
+                                $operator = strtoupper($fieldName);
+                                $whereClauses[] = $operator . ' (' . implode(' AND ', $subClauses) . ')';
+                            } else {
+                                throw new \Exception("The '$fieldName' operator must be followed by an array of conditions.");
+                            }
                         } else {
-                            throw new \Exception("The '$fieldName' field does not exist in the User model.");
+                            // Normal field check
+                            if (array_key_exists($fieldName, $this->_fields)) {
+                                $whereClauses[] = "$fieldName = :where_$fieldName";
+                                $bindings[":where_$fieldName"] = $fieldValue;
+                            } else {
+                                throw new \Exception("The '$fieldName' field does not exist in the User model.");
+                            }
                         }
                     }
 
@@ -2233,17 +2150,18 @@ class User implements IModel
                 $isNullable = $field['isNullable'];
                 $relation = $field['decorators']['relation'] ?? null;
                 $inverseRelation = $field['decorators']['inverseRelation'] ?? null;
+                $implicitRelation = $field['decorators']['implicitRelation'] ?? null;
 
                 if (isset($dataToUpdate[$fieldName]) || !$isNullable) {
                     if (!array_key_exists($fieldName, $dataToUpdate)) continue;
-                    if (isset($relation) || isset($inverseRelation)) continue;
+                    if (isset($relation) || isset($inverseRelation) || isset($implicitRelation)) continue;
                     $validateMethodName = lcfirst($fieldType);
                     $validatedValue = Validator::$validateMethodName($dataToUpdate[$fieldName]);
                     $updateFields[] = "$fieldName = :$fieldName";
                     $bindings[":$fieldName"] = $validatedValue;
                 } else {
                     if (array_key_exists($fieldName, $dataToUpdate) && $isNullable) {
-                        if (isset($relation) || isset($inverseRelation)) continue;
+                        if (isset($relation) || isset($inverseRelation) || isset($implicitRelation)) continue;
                         $updateFields[] = "$fieldName = NULL";
                     }
                 }
@@ -2252,20 +2170,42 @@ class User implements IModel
             $sql .= implode(', ', $updateFields);
 
             if (!empty($where)) {
-                $whereClauses = [];
-                foreach ($where as $fieldName => $fieldValue) {
-                    if (array_key_exists($fieldName, $this->_fields)) {
-                        $whereClauses[] = "$fieldName = :where_$fieldName";
-                        $bindings[":where_$fieldName"] = $fieldValue;
-                    } else {
-                        throw new \Exception("The '$fieldName' field does not exist in the User model.");
+                    $whereClauses = [];
+
+                    foreach ($where as $fieldName => $fieldValue) {
+                        // Handle logical operators AND, OR, NOT
+                        if (in_array(strtoupper($fieldName), ['AND', 'OR', 'NOT'])) {
+                            if (is_array($fieldValue)) {
+                                $subClauses = [];
+                                foreach ($fieldValue as $subField => $subValue) {
+                                    if (array_key_exists($subField, $this->_fields)) {
+                                        $subClauses[] = "$subField = :where_$subField";
+                                        $bindings[":where_$subField"] = $subValue;
+                                    } else {
+                                        throw new \Exception("The '$subField' field does not exist in the User model.");
+                                    }
+                                }
+
+                                $operator = strtoupper($fieldName);
+                                $whereClauses[] = $operator . ' (' . implode(' AND ', $subClauses) . ')';
+                            } else {
+                                throw new \Exception("The '$fieldName' operator must be followed by an array of conditions.");
+                            }
+                        } else {
+                            // Normal field check
+                            if (array_key_exists($fieldName, $this->_fields)) {
+                                $whereClauses[] = "$fieldName = :where_$fieldName";
+                                $bindings[":where_$fieldName"] = $fieldValue;
+                            } else {
+                                throw new \Exception("The '$fieldName' field does not exist in the User model.");
+                            }
+                        }
+                    }
+
+                    if (!empty($whereClauses)) {
+                        $sql .= " WHERE " . implode(' AND ', $whereClauses);
                     }
                 }
-
-                if (!empty($whereClauses)) {
-                    $sql .= " WHERE " . implode(' AND ', $whereClauses);
-                }
-            }
 
             $stmt = $this->_pdo->prepare($sql);
             foreach ($bindings as $key => $value) {

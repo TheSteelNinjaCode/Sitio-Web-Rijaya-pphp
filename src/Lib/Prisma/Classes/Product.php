@@ -106,25 +106,6 @@ class Product implements IModel
                 'isPrimaryKey' => '',
                 'decorators' =>
                 array (
-                    'inverseRelation' => 
-                    array (
-                      'fromModel' => 'Product',
-                      'fromModelTableName' => 'Product',
-                      'fromField' => 'categories',
-                      'toModel' => 'Category',
-                      'toField' => 'Product',
-                      'type' => 'OneToMany',
-                      'fields' => 
-                      array (
-                        0 => 'id',
-                      ),
-                      'references' => 
-                      array (
-                        0 => 'id',
-                      ),
-                      'tableName' => 'Category',
-                      'tablePrimaryKey' => 'id',
-                    ),
                   )
                 ),
             'ProductCategory' =>
@@ -217,8 +198,8 @@ class Product implements IModel
             );
 
         $this->_modelName = 'Product';
-        $this->_fieldsOnly = ['id', 'name', 'description', 'price', 'createdAt', 'updatedAt'];
-        $this->_fieldsRelated = ['categories', 'ProductCategory', 'ProductImage', 'CartItem'];
+        $this->_fieldsOnly = ['id', 'name', 'description', 'price', 'createdAt', 'updatedAt', 'categories'];
+        $this->_fieldsRelated = ['ProductCategory', 'ProductImage', 'CartItem'];
 
         $this->_col = new class()
         {
@@ -244,207 +225,13 @@ class Product implements IModel
             $this->price = $data['price'] ?? null;
             $this->createdAt = $data['createdAt'] ?? null;
             $this->updatedAt = $data['updatedAt'] ?? null;
-            $this->categories = new Category($this->_pdo, $data['categories'] ?? null);
+            $this->categories = $data['categories'] ?? null;
             $this->ProductCategory = new ProductCategory($this->_pdo, $data['ProductCategory'] ?? null);
             $this->ProductImage = new ProductImage($this->_pdo, $data['ProductImage'] ?? null);
             $this->CartItem = new CartItem($this->_pdo, $data['CartItem'] ?? null);
         }
     }
 
-    public function getId()
-    {
-        return $this->id;
-    }
-
-    public function setId($value)
-    {
-        $validatedValue = Validator::string($value);
-        $this->id = $validatedValue;
-    }
-
-    public function getName()
-    {
-        return $this->name;
-    }
-
-    public function setName($value)
-    {
-        $validatedValue = Validator::string($value);
-        $this->name = $validatedValue;
-    }
-
-    public function getDescription()
-    {
-        return $this->description;
-    }
-
-    public function setDescription($value)
-    {
-        $validatedValue = Validator::string($value);
-        $this->description = $validatedValue;
-    }
-
-    public function getPrice()
-    {
-        return $this->price;
-    }
-
-    public function setPrice($value)
-    {
-        $validatedValue = Validator::float($value);
-        $this->price = $validatedValue;
-    }
-
-    public function getCreatedAt()
-    {
-        return $this->createdAt;
-    }
-
-    public function setCreatedAt($value)
-    {
-        $validatedValue = Validator::dateTime($value);
-        $this->createdAt = $validatedValue;
-    }
-
-    public function getUpdatedAt()
-    {
-        return $this->updatedAt;
-    }
-
-    public function setUpdatedAt($value)
-    {
-        $validatedValue = Validator::dateTime($value);
-        $this->updatedAt = $validatedValue;
-    }
-
-    protected function includeCategories(array $items, array $selectedFields = [], array $includeSelectedFields = [], bool $format = false) 
-    {
-        if (empty($items)) {
-            return $items;
-        }
-
-        $singleItem = false;
-        $itemsArrayType = Utility::checkArrayContents($items);
-        if ($itemsArrayType === ArrayType::Value) {
-            $items = [$items];
-            $singleItem = true;
-        }
-
-        $dbType = $this->_dbType;
-        $quotedTableName = $dbType == 'pgsql' ? "\"Product\"" : "`Product`";
-        $tableName = $dbType == 'pgsql' ? "\"Category\"" : "`Category`";
-        $modelName = 'Category';
-        $relationName = 'categories';
-        $foreignKeyIds = array_column($items, 'id');
-        $primaryKey = 'id';
-        $foreignKey = 'id';
-        $primaryKeyQuoted = $dbType == 'pgsql' ? "\"id\"" : "`id`";
-        $foreignKeyQuoted = $dbType == 'pgsql' ? "\"id\"" : "`id`";
-        $foreignKeyIds = array_filter($foreignKeyIds); // Filter out any empty values
-        $foreignKeyIds = array_unique($foreignKeyIds);
-
-        $modelName = new Category($this->_pdo);
-        foreach ($items as &$item) {
-            if (!isset($item[$primaryKey])) {
-                $item[$relationName] = [];
-                continue;
-            }
-            $relatedRecords = $modelName->findMany(['where' => [$foreignKey => $item[$primaryKey]], 'select' => $includeSelectedFields], $format);
-            $item[$relationName] = $relatedRecords;
-        }
-
-        return $singleItem ? reset($items) : $items;
-    }
-
-    protected function connectCategories(string $relationName, array $connectData, string $lastInsertId, string $connectType = 'connect')
-    {
-        $dbType = $this->_dbType;
-        $quotedTableName = $dbType == 'pgsql' ? "\"Product\"" : "`Product`";
-        $tableName = $dbType == 'pgsql' ? "\"Category\"" : "`Category`";
-        $modelName = 'Category';
-        $tablePrimaryKey = 'id';
-        $relatedForeignKey = 'id';
-        $relationType = 'OneToMany';
-        $typeOfTableRelation = 'inverse';
-        $primaryKeyQuoted = $dbType == 'pgsql' ? "\"id\"" : "`id`";
-        $foreignKeyQuoted = $dbType == 'pgsql' ? "\"id\"" : "`id`";
-
-        if (!is_array($connectData) && $connectType !== 'disconnect') {
-            throw new \Exception("Error connecting $modelName: connectData must be an array");
-        }
-
-        if ($connectType === 'connectOrCreate' && (!array_key_exists('where', $connectData) || !array_key_exists('create', $connectData))) {
-            throw new \Exception("Error connecting $modelName: connectOrCreate requires both where and create keys");
-        }
-
-        $relationModel = new Category($this->_pdo);
-
-        if ($connectType === 'create') {
-            $dataToCreate = [$relatedForeignKey => $lastInsertId, ...$connectData];
-            $relationModel->create(['data' => $dataToCreate]);
-            return;
-        }
-
-        if ($connectType === 'createMany') {
-
-            if ($typeOfTableRelation === 'inverse' && $relationType !== 'OneToMany') {
-                throw new \Exception("Error connecting $modelName: createMany is only supported for OneToMany relations");
-            }
-
-            $dataToUpdate = array_map(function($data) use ($relatedForeignKey, $lastInsertId) {
-                $data[$relatedForeignKey] = $lastInsertId;
-                return $data;
-            }, $connectData);
-
-            $relationModel->createMany(['data' => $dataToUpdate]);
-            return;
-        }
-
-        if ($connectType === 'update' || $connectType === 'updateMany') {
-            if ($typeOfTableRelation === 'inverse' && $relationType === 'OneToMany' && !isset($connectData['where']) && !isset($connectData['data'])) {
-                throw new \Exception("Error connecting $modelName: OneToMany relation requires both where and data keys");
-            }
-
-            try {
-                if ($connectType === 'updateMany') {
-                    $where = isset($connectData['where']) ? $connectData['where'] : ['where' => $connectData];
-                    return $relationModel->updateMany($connectData);
-                }
-                return $relationModel->update($connectData);
-            } catch (\Exception $e) {
-                throw new \Exception("Error connecting $modelName: " . $e->getMessage());
-            }
-        }
-
-        $where = isset($connectData['where']) ? $connectData['where'] : ['where' => $connectData];
-        $foundUnique = $relationModel->findUnique($where);
-
-        if (empty($foundUnique) && $connectType === 'connect') {
-            throw new \Exception("Error connecting $modelName: No record found for connectData");
-        }
-
-        if (empty($foundUnique) && $connectType === 'connectOrCreate') {
-            $foundUnique = $relationModel->create(['data' => $connectData['create']]);
-        }
-
-        if (!empty($foundUnique) && $connectType === 'connect') {
-            try {
-
-                $relationModel->update(['where' => [$tablePrimaryKey => $foundUnique[$tablePrimaryKey]], 'data' => [$relatedForeignKey => $lastInsertId]]);
-            } catch (\Exception $e) {
-                throw new \Exception("Error connecting categories: " . $e->getMessage());
-            }
-        }
-
-        if (!empty($foundUnique) && $connectType === 'disconnect') {
-            try {
-
-                $relationModel->update(['where' => [$tablePrimaryKey => $foundUnique[$tablePrimaryKey]], 'data' => [$relatedForeignKey => null]]);
-            } catch (\Exception $e) {
-                throw new \Exception("Error disconnecting categories: " . $e->getMessage());
-            }
-        }
-    }
     protected function includeProductCategory(array $items, array $selectedFields = [], array $includeSelectedFields = [], bool $format = false) 
     {
         if (empty($items)) {
@@ -471,13 +258,15 @@ class Product implements IModel
         $foreignKeyIds = array_filter($foreignKeyIds); // Filter out any empty values
         $foreignKeyIds = array_unique($foreignKeyIds);
 
-        $modelName = new ProductCategory($this->_pdo);
+        $instanceModelName = new ProductCategory($this->_pdo);
         foreach ($items as &$item) {
             if (!isset($item[$primaryKey])) {
                 $item[$relationName] = [];
                 continue;
             }
-            $relatedRecords = $modelName->findMany(['where' => [$foreignKey => $item[$primaryKey]], 'select' => $includeSelectedFields], $format);
+            $whereQuery = ['where' => [$foreignKey => $item[$primaryKey]]];
+            $mergeQuery = array_merge($whereQuery, $includeSelectedFields);
+            $relatedRecords = $instanceModelName->findMany($mergeQuery, $format);
             $item[$relationName] = $relatedRecords;
         }
 
@@ -599,13 +388,15 @@ class Product implements IModel
         $foreignKeyIds = array_filter($foreignKeyIds); // Filter out any empty values
         $foreignKeyIds = array_unique($foreignKeyIds);
 
-        $modelName = new ProductImage($this->_pdo);
+        $instanceModelName = new ProductImage($this->_pdo);
         foreach ($items as &$item) {
             if (!isset($item[$primaryKey])) {
                 $item[$relationName] = [];
                 continue;
             }
-            $relatedRecords = $modelName->findMany(['where' => [$foreignKey => $item[$primaryKey]], 'select' => $includeSelectedFields], $format);
+            $whereQuery = ['where' => [$foreignKey => $item[$primaryKey]]];
+            $mergeQuery = array_merge($whereQuery, $includeSelectedFields);
+            $relatedRecords = $instanceModelName->findMany($mergeQuery, $format);
             $item[$relationName] = $relatedRecords;
         }
 
@@ -727,13 +518,15 @@ class Product implements IModel
         $foreignKeyIds = array_filter($foreignKeyIds); // Filter out any empty values
         $foreignKeyIds = array_unique($foreignKeyIds);
 
-        $modelName = new CartItem($this->_pdo);
+        $instanceModelName = new CartItem($this->_pdo);
         foreach ($items as &$item) {
             if (!isset($item[$primaryKey])) {
                 $item[$relationName] = [];
                 continue;
             }
-            $relatedRecords = $modelName->findMany(['where' => [$foreignKey => $item[$primaryKey]], 'select' => $includeSelectedFields], $format);
+            $whereQuery = ['where' => [$foreignKey => $item[$primaryKey]]];
+            $mergeQuery = array_merge($whereQuery, $includeSelectedFields);
+            $relatedRecords = $instanceModelName->findMany($mergeQuery, $format);
             $item[$relationName] = $relatedRecords;
         }
 
@@ -909,6 +702,7 @@ class Product implements IModel
         $requiredFieldsMap = [
             'name' => 'String',
             'price' => 'Float',
+            'categories' => 'Category',
         ];
         foreach ($requiredFieldsMap as $fieldName => $fieldType) {
             if (!isset($data['data'][$fieldName])) {
@@ -919,7 +713,7 @@ class Product implements IModel
         $select = $data['select'] ?? [];
         $include = $data['include'] ?? [];
         $data = $data['data'];
-        $relationNames = ['categories', 'ProductCategory', 'ProductImage', 'CartItem'];
+        $relationNames = ['ProductCategory', 'ProductImage', 'CartItem'];
 
         $primaryKeyField = '';
         $insertFields = [];
@@ -938,6 +732,7 @@ class Product implements IModel
                 $isNullable = $field['isNullable'];
                 $relation = $field['decorators']['relation'] ?? null;
                 $inverseRelation = $field['decorators']['inverseRelation'] ?? null;
+                $implicitRelation = $field['decorators']['implicitRelation'] ?? null;
 
                 if (!empty($field['decorators']['id'])) {
                     $primaryKeyField = $fieldName;
@@ -956,12 +751,12 @@ class Product implements IModel
                     }
                 } elseif (isset($data[$fieldName]) || !$isNullable) {
                     if (!array_key_exists($fieldName, $data)) continue;
-                    if (isset($relation) || isset($inverseRelation)) continue;
+                    if (isset($relation) || isset($inverseRelation) || isset($implicitRelation)) continue;
                     $validateMethodName = lcfirst($fieldType);
                     $bindings[$fieldName] = Validator::$validateMethodName($data[$fieldName]);
                 } elseif (isset($data[$fieldName]) && $isNullable) {
                     if (!array_key_exists($fieldName, $data)) continue;
-                    if (isset($relation) || isset($inverseRelation)) continue;
+                    if (isset($relation) || isset($inverseRelation) || isset($implicitRelation)) continue;
                     $insertFields[] = $fieldName;
                     $placeholders[] = "NULL";
                 }
@@ -1173,6 +968,7 @@ class Product implements IModel
         $requiredFieldsMap = [
             'name' => 'String',
             'price' => 'Float',
+            'categories' => 'Category',
         ];
         foreach ($data['data'] as $item) {
             foreach ($requiredFieldsMap as $fieldName => $fieldType) {
@@ -1201,6 +997,7 @@ class Product implements IModel
                 $isNullable = $field['isNullable'];
                 $relation = $field['decorators']['relation'] ?? null;
                 $inverseRelation = $field['decorators']['inverseRelation'] ?? null;
+                $implicitRelation = $field['decorators']['implicitRelation'] ?? null;
     
                 if (!empty($field['decorators']['id'])) {
                     if (empty($item[$fieldName])) {
@@ -1214,14 +1011,14 @@ class Product implements IModel
                         $item[$fieldName] = Validator::$validateMethodName($data[$fieldName]);
                     }
                 } else if (isset($item[$fieldName]) || !$isNullable) {
-                    if (!array_key_exists($fieldName, $item)) continue;
+                    if (isset($relation) || isset($inverseRelation) || isset($implicitRelation)) continue;
                     if (isset($relation) || isset($inverseRelation)) {
                         throw new \Exception("The 'createMany' method does not support creating related records.");
                     }
                     $validateMethodName = lcfirst($fieldType);
                     $item[$fieldName] = Validator::$validateMethodName($item[$fieldName]);
                 } else if (isset($item[$fieldName]) && $isNullable) {
-                    if (!array_key_exists($fieldName, $item)) continue;
+                    if (isset($relation) || isset($inverseRelation) || isset($implicitRelation)) continue;
                     if (isset($relation) || isset($inverseRelation)) {
                         throw new \Exception("The 'createMany' method does not support creating related records.");
                     }
@@ -1337,7 +1134,7 @@ class Product implements IModel
         $dbType = $this->_dbType;
         $quotedTableName = $dbType == 'pgsql' ? "\"Product\"" : "`Product`";
 
-        $relationNames = ['categories', 'ProductCategory', 'ProductImage', 'CartItem'];
+        $relationNames = ['ProductCategory', 'ProductImage', 'CartItem'];
 
         $timestamp = "";
         if (!isset($select[$tablePrimaryKey])) {
@@ -1488,7 +1285,7 @@ class Product implements IModel
         $dbType = $this->_dbType;
         $quotedTableName = $dbType == 'pgsql' ? "\"Product\"" : "`Product`";
 
-        $relationNames = ['categories', 'ProductCategory', 'ProductImage', 'CartItem'];
+        $relationNames = ['ProductCategory', 'ProductImage', 'CartItem'];
 
         $timestamp = "";
         if (!isset($select[$tablePrimaryKey])) {
@@ -1668,7 +1465,7 @@ class Product implements IModel
         $dbType = $this->_dbType;
         $quotedTableName = $dbType == 'pgsql' ? "\"Product\"" : "`Product`";
 
-        $relationNames = ['categories', 'ProductCategory', 'ProductImage', 'CartItem'];
+        $relationNames = ['ProductCategory', 'ProductImage', 'CartItem'];
 
         $timestamp = "";
         if (!isset($select[$tablePrimaryKey])) {
@@ -1849,6 +1646,7 @@ class Product implements IModel
         $requiredFieldsMap = [
             'name' => 'String',
             'price' => 'Float',
+            'categories' => 'Category',
         ];
         foreach ($requiredFieldsMap as $fieldName => $fieldType) {
             if (isset($data['data'][$fieldName]) && empty($data['data'][$fieldName])) {
@@ -1860,7 +1658,7 @@ class Product implements IModel
         $select = $data['select'] ?? [];
         $include = $data['include'] ?? [];
         $data = $data['data'];
-        $relationNames = ['categories', 'ProductCategory', 'ProductImage', 'CartItem'];
+        $relationNames = ['ProductCategory', 'ProductImage', 'CartItem'];
 
         $dbType = $this->_dbType;
         $quotedTableName = $dbType == 'pgsql' ? "\"Product\"" : "`Product`";
@@ -1879,19 +1677,20 @@ class Product implements IModel
                 $isNullable = $field['isNullable'];
                 $relation = $field['decorators']['relation'] ?? null;
                 $inverseRelation = $field['decorators']['inverseRelation'] ?? null;
+                $implicitRelation = $field['decorators']['implicitRelation'] ?? null;
                 if (!empty($field['decorators']['id'])) {
                     $primaryKeyField = $fieldName;
                 }
                 if (isset($data[$fieldName]) || !$isNullable) {
                     if (!array_key_exists($fieldName, $data)) continue;
-                    if (isset($relation) || isset($inverseRelation)) continue;
+                    if (isset($relation) || isset($inverseRelation) || isset($implicitRelation)) continue;
                     $validateMethodName = lcfirst($fieldType);
                     $validatedValue = Validator::$validateMethodName($data[$fieldName]);
                     $updateFields[] = $dbType == 'pgsql' ? "\"$fieldName\" = :$fieldName" : "`$fieldName` = :$fieldName";
                     $bindings[":$fieldName"] = $validatedValue;
                 } else {
                     if (array_key_exists($fieldName, $data) && $isNullable) {
-                        if (isset($relation) || isset($inverseRelation)) continue;
+                        if (isset($relation) || isset($inverseRelation) || isset($implicitRelation)) continue;
                         $updateFields[] = $dbType == 'pgsql' ? "\"$fieldName\" = NULL" : "`$fieldName` = NULL";
                     }
                 }
@@ -1902,12 +1701,34 @@ class Product implements IModel
 
                 if (!empty($where)) {
                     $whereClauses = [];
+
                     foreach ($where as $fieldName => $fieldValue) {
-                        if (array_key_exists($fieldName, $this->_fields)) {
-                            $whereClauses[] = "$fieldName = :where_$fieldName";
-                            $bindings[":where_$fieldName"] = $fieldValue;
+                        // Handle logical operators AND, OR, NOT
+                        if (in_array(strtoupper($fieldName), ['AND', 'OR', 'NOT'])) {
+                            if (is_array($fieldValue)) {
+                                $subClauses = [];
+                                foreach ($fieldValue as $subField => $subValue) {
+                                    if (array_key_exists($subField, $this->_fields)) {
+                                        $subClauses[] = "$subField = :where_$subField";
+                                        $bindings[":where_$subField"] = $subValue;
+                                    } else {
+                                        throw new \Exception("The '$subField' field does not exist in the Product model.");
+                                    }
+                                }
+
+                                $operator = strtoupper($fieldName);
+                                $whereClauses[] = $operator . ' (' . implode(' AND ', $subClauses) . ')';
+                            } else {
+                                throw new \Exception("The '$fieldName' operator must be followed by an array of conditions.");
+                            }
                         } else {
-                            throw new \Exception("The '$fieldName' field does not exist in the Product model.");
+                            // Normal field check
+                            if (array_key_exists($fieldName, $this->_fields)) {
+                                $whereClauses[] = "$fieldName = :where_$fieldName";
+                                $bindings[":where_$fieldName"] = $fieldValue;
+                            } else {
+                                throw new \Exception("The '$fieldName' field does not exist in the Product model.");
+                            }
                         }
                     }
 
@@ -2436,6 +2257,7 @@ class Product implements IModel
         $requiredFieldsMap = [
             'name' => 'String',
             'price' => 'Float',
+            'categories' => 'Category',
         ];
         foreach ($data['data'] as $item) {
             foreach ($requiredFieldsMap as $fieldName => $fieldType) {
@@ -2468,17 +2290,18 @@ class Product implements IModel
                 $isNullable = $field['isNullable'];
                 $relation = $field['decorators']['relation'] ?? null;
                 $inverseRelation = $field['decorators']['inverseRelation'] ?? null;
+                $implicitRelation = $field['decorators']['implicitRelation'] ?? null;
 
                 if (isset($dataToUpdate[$fieldName]) || !$isNullable) {
                     if (!array_key_exists($fieldName, $dataToUpdate)) continue;
-                    if (isset($relation) || isset($inverseRelation)) continue;
+                    if (isset($relation) || isset($inverseRelation) || isset($implicitRelation)) continue;
                     $validateMethodName = lcfirst($fieldType);
                     $validatedValue = Validator::$validateMethodName($dataToUpdate[$fieldName]);
                     $updateFields[] = "$fieldName = :$fieldName";
                     $bindings[":$fieldName"] = $validatedValue;
                 } else {
                     if (array_key_exists($fieldName, $dataToUpdate) && $isNullable) {
-                        if (isset($relation) || isset($inverseRelation)) continue;
+                        if (isset($relation) || isset($inverseRelation) || isset($implicitRelation)) continue;
                         $updateFields[] = "$fieldName = NULL";
                     }
                 }
@@ -2487,20 +2310,42 @@ class Product implements IModel
             $sql .= implode(', ', $updateFields);
 
             if (!empty($where)) {
-                $whereClauses = [];
-                foreach ($where as $fieldName => $fieldValue) {
-                    if (array_key_exists($fieldName, $this->_fields)) {
-                        $whereClauses[] = "$fieldName = :where_$fieldName";
-                        $bindings[":where_$fieldName"] = $fieldValue;
-                    } else {
-                        throw new \Exception("The '$fieldName' field does not exist in the Product model.");
+                    $whereClauses = [];
+
+                    foreach ($where as $fieldName => $fieldValue) {
+                        // Handle logical operators AND, OR, NOT
+                        if (in_array(strtoupper($fieldName), ['AND', 'OR', 'NOT'])) {
+                            if (is_array($fieldValue)) {
+                                $subClauses = [];
+                                foreach ($fieldValue as $subField => $subValue) {
+                                    if (array_key_exists($subField, $this->_fields)) {
+                                        $subClauses[] = "$subField = :where_$subField";
+                                        $bindings[":where_$subField"] = $subValue;
+                                    } else {
+                                        throw new \Exception("The '$subField' field does not exist in the Product model.");
+                                    }
+                                }
+
+                                $operator = strtoupper($fieldName);
+                                $whereClauses[] = $operator . ' (' . implode(' AND ', $subClauses) . ')';
+                            } else {
+                                throw new \Exception("The '$fieldName' operator must be followed by an array of conditions.");
+                            }
+                        } else {
+                            // Normal field check
+                            if (array_key_exists($fieldName, $this->_fields)) {
+                                $whereClauses[] = "$fieldName = :where_$fieldName";
+                                $bindings[":where_$fieldName"] = $fieldValue;
+                            } else {
+                                throw new \Exception("The '$fieldName' field does not exist in the Product model.");
+                            }
+                        }
+                    }
+
+                    if (!empty($whereClauses)) {
+                        $sql .= " WHERE " . implode(' AND ', $whereClauses);
                     }
                 }
-
-                if (!empty($whereClauses)) {
-                    $sql .= " WHERE " . implode(' AND ', $whereClauses);
-                }
-            }
 
             $stmt = $this->_pdo->prepare($sql);
             foreach ($bindings as $key => $value) {
