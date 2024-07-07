@@ -14,6 +14,7 @@ class Prisma
     public $productCategory;
     public $cart;
     public $cartItem;
+    public $contact;
 
     public function __construct()
     {
@@ -27,6 +28,7 @@ class Prisma
         $this->productCategory = new ProductCategory($this->_pdo);
         $this->cart = new Cart($this->_pdo);
         $this->cartItem = new CartItem($this->_pdo);
+        $this->contact = new Contact($this->_pdo);
     }
 
     private function initializePDO()

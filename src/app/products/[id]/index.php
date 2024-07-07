@@ -16,10 +16,6 @@ if (!empty($id)) {
         'include' => ['ProductImage' => true, 'ProductCategory' => true],
     ], true);
 
-    // echo "<pre>";
-    // print_r($product);
-    // echo "</pre>";
-
     if ($product) {
         $relatedProducts = $prisma->productCategory->findMany([
             'where' => [
@@ -83,10 +79,10 @@ function addToCart($data)
                 <option></option>
                 <option></option>
             </select>
-
-            <form id="add-to-cart" onsubmit="addToCart">
-                <input type="number" value="1">
-            </form>
+            <!-- 
+            <form id="add-to-cart" onsubmit="addToCart"> -->
+            <input type="number" value="1" oninput="addToCart">
+            <!-- </form> -->
             <button form="add-to-cart" class="btn">Añadir al carrito
                 <span></span>
                 <span></span>

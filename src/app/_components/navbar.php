@@ -6,13 +6,6 @@ $auth = new Auth();
 
 $userName = $auth->getPayload()->name ?? '';
 
-function logout()
-{
-    global $auth;
-    $auth->logout();
-    redirect('/');
-}
-
 ?>
 
 <?php if ($pathname === '/') : ?>

@@ -1,0 +1,324 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: "Poppins", sans-serif;
+}
+
+a {
+  text-decoration: none;
+  color: #555;
+}
+
+p {
+  color: #555;
+}
+
+.header {
+  background: radial-gradient(#fff, #d6edff);
+}
+
+.container {
+  max-width: 1300px;
+  margin: auto;
+  padding-left: 25px;
+  padding-right: 25px;
+}
+
+.navbar {
+  display: flex;
+  align-items: center;
+  padding: 20px;
+}
+
+nav {
+  flex: 1;
+  text-align: right;
+}
+
+nav ul {
+  display: inline-block;
+  list-style-type: none;
+}
+
+nav ul li {
+  display: inline-block;
+  margin-right: 20px;
+}
+
+.menu-icon {
+  display: none;
+  width: 28px;
+  margin-left: 20px;
+}
+
+/*---------- 600 media query -------*/
+@media only screen and (max-width: 800px) {
+  nav ul {
+    position: absolute;
+    top: 70px;
+    left: 0;
+    background: #333;
+    width: 100%;
+    overflow: hidden;
+    transition: 1s;
+    max-height: 0;
+    transition: max-height 0.5s;
+  }
+
+  nav ul li {
+    display: block;
+    margin-right: 50px;
+    margin-top: 10px;
+    margin-bottom: 10px;
+  }
+
+  nav ul li a {
+    color: #fff;
+  }
+
+  .menu-icon {
+    display: block;
+    cursor: pointer;
+  }
+}
+
+main {
+  padding: 50px;
+  margin-bottom: 15px;
+  /* Ajusta el margen inferior del párrafo */
+}
+
+main h1 {
+  margin-bottom: 20px;
+  /* Ajusta el margen inferior del título */
+  text-align: center;
+  /* Centra el texto */
+}
+
+main p {
+  margin-bottom: 40px;
+  /* Ajusta el margen inferior del párrafo */
+  text-align: center;
+  /* Centra el texto */
+}
+
+.contact-container {
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 20px;
+  max-width: 960px;
+  /* Ajusta el ancho máximo según sea necesario */
+  margin: auto;
+  /* Centra el contenedor */
+}
+
+form {
+  flex: 1;
+  min-width: 300px;
+  max-width: 500px;
+  /* Ajusta el ancho máximo según sea necesario */
+  background-color: #fff;
+  padding: 15px;
+  /* Ajusta el relleno según sea necesario */
+  border-radius: 8px;
+  box-shadow: 0 0 10px rgba(152, 209, 255, 0.726);
+  height: 642px;
+  /* Ajusta la altura para que sea más pequeña */
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+form div {
+  margin-bottom: 15px;
+}
+
+form label {
+  display: block;
+  margin-bottom: 5px;
+  font-weight: bold;
+}
+
+form input,
+form textarea {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+.map-container {
+  flex: 1;
+  min-width: 300px;
+  max-width: 400px;
+  /* Ajusta el ancho máximo según sea necesario */
+  height: 300px;
+  /* Ajusta la altura según sea necesario */
+}
+
+.map-container iframe {
+  width: 100%;
+  height: 100%;
+  border: 0;
+  border-radius: 8px;
+  box-shadow: 0 0 10px rgba(152, 209, 255, 0.726);
+  margin-bottom: 35px;
+}
+
+/*mapa dos*/
+.map-container-2 {
+  flex: 1;
+  min-width: 300px;
+  max-width: 400px;
+  /* Ajusta el ancho máximo según sea necesario */
+  height: 300px;
+  /* Ajusta la altura según sea necesario */
+  margin-bottom: 40px;
+}
+
+.map-container-2 iframe {
+  width: 100%;
+  height: 100%;
+  border: 0;
+  border-radius: 8px;
+  box-shadow: 0 0 10px rgba(152, 209, 255, 0.726);
+}
+
+.footer-section.social-icons {
+  text-align: center;
+  background: radial-gradient(#fff, #d0ebff);
+  padding: 23px;
+}
+
+.footer-section.social-icons h3 {
+  color: #555555cc;
+  margin-bottom: 7px;
+  /* Ajusta este valor según sea necesario */
+}
+
+.footer-section.address {
+  text-align: center;
+  margin-top: 8px;
+}
+
+.footer-section.address p {
+  margin-bottom: 5px;
+  /* Ajusta este valor según sea necesario */
+  text-align: center;
+  color: #000000d0;
+}
+
+.contact-info {
+  display: flex;
+  justify-content: center;
+  gap: 30px;
+  /* Adjust the gap as needed */
+  margin-left: 65px;
+}
+
+.contact-item {
+  margin: 5px 0;
+  display: flex;
+  /* Make contact items flex containers */
+  align-items: center;
+  /* Align items vertically */
+  color: #424242;
+}
+
+.contact-item i {
+  margin-right: 5px;
+}
+
+.contact-item span {
+  margin-right: 50px;
+  /* Adjust spacing between phone number and email */
+  padding: 10px;
+  color: #0f74bc;
+  filter: grayscale(90%);
+  text-decoration: underline;
+}
+
+.contact-item span:hover {
+  filter: grayscale(0);
+}
+
+.footer-section.contact-info {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 10px;
+}
+
+.footer-section.logo {
+  text-align: center;
+  margin-bottom: 5px;
+}
+
+.footer-section.copyright {
+  padding: 4px 20px;
+}
+
+.footer-section.copyright p {
+  color: #000000d0;
+}
+
+.btn {
+  position: relative;
+  display: inline-block;
+  padding: 3px 7px;
+  text-decoration: none;
+  color: #000;
+  border: 3px solid;
+  border-radius: 50px;
+  transition: all 0.3s ease;
+  margin-bottom: 50px;
+  margin-top: 22px;
+}
+
+.btn:hover {
+  background-color: #03468ecd;
+  box-shadow: 0 0 20px var(--color);
+  border-color: var(--color);
+  color: #fff;
+}
+
+.btn span:nth-child(n) {
+  position: absolute;
+  width: 10px;
+  height: 10px;
+  border: 3px solid;
+  transition: all 0.6s ease;
+}
+
+.btn span:nth-child(1) {
+  right: 10%;
+  top: -10px;
+  background-color: #fff;
+}
+
+.btn span:nth-child(2) {
+  left: 10%;
+  bottom: -10px;
+  background-color: #fff;
+}
+
+.btn:hover span:nth-child(1) {
+  right: 80%;
+  transform: rotate(90deg);
+  background-color: var(--color);
+}
+
+.btn:hover span:nth-child(2) {
+  left: 80%;
+  transform: rotate(90deg);
+  background-color: var(--color);
+}
+
+:root {
+  --color: #78a7ffdd;
+}

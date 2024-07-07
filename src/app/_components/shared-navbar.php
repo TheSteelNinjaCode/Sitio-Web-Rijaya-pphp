@@ -1,3 +1,16 @@
+<?php
+
+use Lib\Auth\Auth;
+
+function logout()
+{
+    $auth = new Auth();
+    $auth->logout();
+    redirect('/');
+}
+
+?>
+
 <div class="navbar">
     <div class="logo">
         <a href="/"><img src="<?php echo $baseUrl; ?>assets/images/Rijaja.png" width="125px"></a>
@@ -7,7 +20,7 @@
             <li><a href="/">Inicio</a></li>
             <li><a href="/products">Productos</a></li>
             <li><a href="">Acerca de</a></li>
-            <li><a href="">Contacto</a></li>
+            <li><a href="/contact">Contacto</a></li>
             <?php if ($auth->isAuthenticated()) : ?>
                 <li><span><?= $userName ?></span></li>
                 <li><button onclick="logout">Cerrar sesión</button></li>

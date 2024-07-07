@@ -5,7 +5,7 @@ use Lib\Prisma\Classes\Prisma;
 $prisma = new Prisma();
 
 $categories = $prisma->category->findMany([
-    'take' => 3
+    'take' => 6
 ], true);
 $featuredProducts = $prisma->product->findMany([
     'take' => 4,
