@@ -50,7 +50,6 @@ $total = $subtotal + $tax;
 
 function removeProduct($data)
 {
-    // return $data;
     global $prisma;
     $prisma->cartItem->delete([
         'where' => [
@@ -76,7 +75,7 @@ function removeProduct($data)
                         <div>
                             <p><?php echo $product['name']; ?></p>
                             <small>Precio: $<?php echo $product['price']; ?></small><br>
-                            <button onclick="removeProduct({'itemId': '<?= $product['itemId'] ?>'})">Eliminar</button>
+                            <button onclick="removeProduct({'itemId': '<?= $product['itemId'] ?>'})" pp-suspense="Eliminando...">Eliminar</button>
                         </div>
                     </div>
                 </td>

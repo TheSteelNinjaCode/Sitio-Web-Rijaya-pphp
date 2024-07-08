@@ -61,7 +61,7 @@ function addToCart($data)
         return;
     }
 
-    $cart = $prisma->cart->create([
+    $prisma->cart->create([
         'data' => [
             'userId' => $userId,
             'items' => [
@@ -73,7 +73,6 @@ function addToCart($data)
         ]
     ], true);
 
-    $state->setState('cartId', $cart->id);
     redirect("/cart");
 }
 
