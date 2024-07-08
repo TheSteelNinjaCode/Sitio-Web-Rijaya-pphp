@@ -20,8 +20,8 @@
     "firebase/php-jwt": "dev-main",
     "phpmailer/phpmailer": "^6.9",
     "guzzlehttp/guzzle": "7.8",
+    "ezyang/htmlpurifier": "^4.17",
     "ramsey/uuid": "5.x-dev",
-    "hidehalo/nanoid-php": "1.x-dev",
-    "ezyang/htmlpurifier": "^4.17"
+    "hidehalo/nanoid-php": "1.x-dev"
   }
 }

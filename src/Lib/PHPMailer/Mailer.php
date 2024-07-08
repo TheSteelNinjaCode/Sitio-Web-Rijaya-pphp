@@ -5,8 +5,6 @@ namespace Lib\PHPMailer;
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\Exception;
 use Lib\Validator;
-use HTMLPurifier;
-use HTMLPurifier_Config;
 
 class Mailer
 {
@@ -53,7 +51,7 @@ class Mailer
             }
 
             $subject = Validator::string($subject);
-            $body = $this->sanitizeHtml($body);
+            $body = Validator::html($body);
             $altBody = $this->convertToPlainText($body);
 
             $name = $options['name'] ?? '';
@@ -112,19 +110,6 @@ class Mailer
                 }
             }
         }
-    }
-
-    /**
-     * Sanitize HTML content using HTMLPurifier.
-     *
-     * @param string $html The HTML content to sanitize.
-     * @return string The sanitized HTML content.
-     */
-    private function sanitizeHtml(string $html): string
-    {
-        $config = HTMLPurifier_Config::createDefault();
-        $purifier = new HTMLPurifier($config);
-        return $purifier->purify($html);
     }
 
     /**
