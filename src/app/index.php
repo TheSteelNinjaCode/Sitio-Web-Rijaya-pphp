@@ -28,6 +28,7 @@ $lastProducts = $prisma->product->findMany([
             <?php foreach ($categories as $category) : ?>
                 <div class="col-3">
                     <img src="<?php echo $baseUrl . $category->image ?>">
+                    <h3><?= $category->name ?></h3>
                 </div>
             <?php endforeach; ?>
         </div>
