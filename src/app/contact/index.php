@@ -46,7 +46,7 @@ function contact($data)
 
     try {
         $mailer = new Mailer();
-        if ($mailer->send($email, $subject, $body, $name)) {
+        if ($mailer->send($email, $subject, $body, ['name' => $name])) {
 
             $prisma = new Prisma();
             $prisma->contact->create([

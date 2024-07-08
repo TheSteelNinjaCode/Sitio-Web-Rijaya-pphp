@@ -5,6 +5,8 @@ namespace Lib\PHPMailer;
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\Exception;
 use Lib\Validator;
+use HTMLPurifier;
+use HTMLPurifier_Config;
 
 class Mailer
 {
@@ -35,50 +37,104 @@ class Mailer
      * @param string $to The recipient's email address.
      * @param string $subject The subject of the email.
      * @param string $body The HTML body of the email.
-     * @param string $name (optional) The name of the recipient.
-     * @param string $altBody (optional) The plain text alternative body of the email.
+     * @param array $options (optional) Additional email options like name, altBody, CC, and BCC.
      *
      * @return bool Returns true if the email is sent successfully, false otherwise.
      *
      * @throws Exception Throws an exception if the email could not be sent.
-     *
-     * @example
-     * $mailer = new Mailer();
-     * $to = 'recipient@example.com';
-     * $subject = 'Hello';
-     * $body = '<h1>Example Email</h1><p>This is the HTML body of the email.</p>';
-     * $name = 'John Doe';
-     * $altBody = 'This is the plain text alternative body of the email.';
-     *
-     * try {
-     *     $result = $mailer->send($to, $subject, $body, $name, $altBody);
-     *     if ($result) {
-     *         echo 'Email sent successfully.';
-     *     } else {
-     *         echo 'Failed to send email.';
-     *     }
-     * } catch (Exception $e) {
-     *     echo 'An error occurred: ' . $e->getMessage();
-     * }
      */
-    public function send(string $to, string $subject, string $body, string $name = '', string $altBody = ''): bool
+    public function send(string $to, string $subject, string $body, array $options = []): bool
     {
         try {
-            Validator::string($to);
-            Validator::string($subject);
-            Validator::string($body);
-            Validator::string($name);
-            Validator::string($altBody);
+            // Validate and sanitize inputs
+            $to = Validator::email($to);
+            if (!$to) {
+                throw new \Exception('Invalid email address for the main recipient');
+            }
 
+            $subject = Validator::string($subject);
+            $body = $this->sanitizeHtml($body);
+            $altBody = $this->convertToPlainText($body);
+
+            $name = $options['name'] ?? '';
+            $addCC = $options['addCC'] ?? [];
+            $addBCC = $options['addBCC'] ?? [];
+
+            $name = Validator::string($name);
+
+            // Handle CC recipients
+            $this->handleRecipients($addCC, 'CC');
+            // Handle BCC recipients
+            $this->handleRecipients($addBCC, 'BCC');
+
+            // Set the main recipient and other email properties
             $this->mail->addAddress($to, $name);
             $this->mail->isHTML(true);
             $this->mail->Subject = $subject;
             $this->mail->Body = $body;
             $this->mail->AltBody = $altBody;
 
+            // Send the email
             return $this->mail->send();
         } catch (\Exception $e) {
             throw new \Exception($e->getMessage());
         }
+    }
+
+    /**
+     * Handle adding CC or BCC recipients.
+     *
+     * @param string|array $recipients Email addresses to add.
+     * @param string $type Type of recipient ('CC' or 'BCC').
+     *
+     * @throws Exception Throws an exception if any email address is invalid.
+     */
+    private function handleRecipients(string|array $recipients, string $type): void
+    {
+        if (!empty($recipients)) {
+            $method = $type === 'CC' ? 'addCC' : 'addBCC';
+
+            if (is_array($recipients)) {
+                foreach ($recipients as $recipient) {
+                    $recipient = Validator::email($recipient);
+                    if ($recipient) {
+                        $this->mail->{$method}($recipient);
+                    } else {
+                        throw new \Exception("Invalid email address in $type");
+                    }
+                }
+            } else {
+                $recipient = Validator::email($recipients);
+                if ($recipient) {
+                    $this->mail->{$method}($recipient);
+                } else {
+                    throw new \Exception("Invalid email address in $type");
+                }
+            }
+        }
+    }
+
+    /**
+     * Sanitize HTML content using HTMLPurifier.
+     *
+     * @param string $html The HTML content to sanitize.
+     * @return string The sanitized HTML content.
+     */
+    private function sanitizeHtml(string $html): string
+    {
+        $config = HTMLPurifier_Config::createDefault();
+        $purifier = new HTMLPurifier($config);
+        return $purifier->purify($html);
+    }
+
+    /**
+     * Convert HTML content to plain text.
+     *
+     * @param string $html The HTML content to convert.
+     * @return string The plain text content.
+     */
+    private function convertToPlainText(string $html): string
+    {
+        return strip_tags(str_replace(['<br>', '<br/>', '<br />', '</p>'], "\n", $html));
     }
 }
