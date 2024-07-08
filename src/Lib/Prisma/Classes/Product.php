@@ -2221,7 +2221,7 @@ class Product implements IModel
             }
             $selectedFields = array_merge($select, $include);
 
-            $deletedRow = $this->findUnique(['where' => $where, $selectOrInclude => $selectedFields], $format);
+            $deletedRow = $this->findFirst(['where' => $where, $selectOrInclude => $selectedFields], $format);
 
             $stmt->execute();
             $affectedRows = $stmt->rowCount();

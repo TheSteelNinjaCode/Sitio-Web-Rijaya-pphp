@@ -3,6 +3,7 @@
 use Lib\Prisma\Classes\Prisma;
 use Lib\Auth\Auth;
 use Lib\Validator;
+use Lib\StateManager;
 
 $prisma = new Prisma();
 $auth = new Auth();
@@ -46,6 +47,11 @@ if (!empty($id)) {
 function addToCart($data)
 {
     global $id, $prisma, $userId;
+    $state = new StateManager();
+
+    if (empty($userId)) {
+        redirect("/account");
+    }
 
     $quantity = $data->quantity;
     if (Validator::int($quantity)) {
@@ -55,7 +61,7 @@ function addToCart($data)
         return;
     }
 
-    $prisma->cart->create([
+    $cart = $prisma->cart->create([
         'data' => [
             'userId' => $userId,
             'items' => [
@@ -65,7 +71,10 @@ function addToCart($data)
                 ]
             ]
         ]
-    ]);
+    ], true);
+
+    $state->setState('cartId', $cart->id);
+    redirect("/cart");
 }
 
 ?>
