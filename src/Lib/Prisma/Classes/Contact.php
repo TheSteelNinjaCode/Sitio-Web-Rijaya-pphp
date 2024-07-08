@@ -69,7 +69,7 @@ class Contact implements IModel
             array(
                 'name' => 'email',
                 'type' => 'String',
-                'isNullable' => '1',
+                'isNullable' => '',
                 'isPrimaryKey' => '',
                 'decorators' =>
                 array (
@@ -240,6 +240,7 @@ class Contact implements IModel
         $data['data']['updatedAt'] = date('Y-m-d H:i:s');
 
         $requiredFieldsMap = [
+            'email' => 'String',
             'subject' => 'String',
             'message' => 'String',
         ];
@@ -276,7 +277,7 @@ class Contact implements IModel
                     $primaryKeyField = $fieldName;
                 }
 
-                if (isset($field['decorators']['default']) && isset($field['decorators']['id'])) {
+                if (isset($field['decorators']['default'])) {
                     if (empty($data[$fieldName])) {
                         if ($field['decorators']['default'] === 'uuid') {
                             $bindings[$fieldName] = \Ramsey\Uuid\Uuid::uuid4()->toString();
@@ -401,6 +402,7 @@ class Contact implements IModel
         }
 
         $requiredFieldsMap = [
+            'email' => 'String',
             'subject' => 'String',
             'message' => 'String',
         ];
@@ -433,7 +435,7 @@ class Contact implements IModel
                 $inverseRelation = $field['decorators']['inverseRelation'] ?? null;
                 $implicitRelation = $field['decorators']['implicitRelation'] ?? null;
     
-                if (!empty($field['decorators']['id'])) {
+                if (isset($field['decorators']['default'])) {
                     if (empty($item[$fieldName])) {
                         if ($field['decorators']['default'] === 'uuid') {
                             $item[$fieldName] = \Ramsey\Uuid\Uuid::uuid4()->toString();
@@ -1078,6 +1080,7 @@ class Contact implements IModel
         $data['data']['updatedAt'] = date('Y-m-d H:i:s');
 
         $requiredFieldsMap = [
+            'email' => 'String',
             'subject' => 'String',
             'message' => 'String',
         ];
@@ -1575,6 +1578,7 @@ class Contact implements IModel
         }
 
         $requiredFieldsMap = [
+            'email' => 'String',
             'subject' => 'String',
             'message' => 'String',
         ];

@@ -573,7 +573,7 @@ class Cart implements IModel
                     $primaryKeyField = $fieldName;
                 }
 
-                if (isset($field['decorators']['default']) && isset($field['decorators']['id'])) {
+                if (isset($field['decorators']['default'])) {
                     if (empty($data[$fieldName])) {
                         if ($field['decorators']['default'] === 'uuid') {
                             $bindings[$fieldName] = \Ramsey\Uuid\Uuid::uuid4()->toString();
@@ -832,7 +832,7 @@ class Cart implements IModel
                 $inverseRelation = $field['decorators']['inverseRelation'] ?? null;
                 $implicitRelation = $field['decorators']['implicitRelation'] ?? null;
     
-                if (!empty($field['decorators']['id'])) {
+                if (isset($field['decorators']['default'])) {
                     if (empty($item[$fieldName])) {
                         if ($field['decorators']['default'] === 'uuid') {
                             $item[$fieldName] = \Ramsey\Uuid\Uuid::uuid4()->toString();

@@ -82,6 +82,25 @@ class Category implements IModel
                 'isPrimaryKey' => '',
                 'decorators' =>
                 array (
+                    'implicitRelation' => 
+                    array (
+                      'fromModel' => 'Category',
+                      'fromModelTableName' => 'Category',
+                      'fromField' => 'products',
+                      'toModel' => 'Product',
+                      'toField' => 'Category',
+                      'type' => 'ManyToMany',
+                      'fields' => 
+                      array (
+                        0 => 'id',
+                      ),
+                      'references' => 
+                      array (
+                        0 => 'id',
+                      ),
+                      'tableName' => 'Product',
+                      'tablePrimaryKey' => 'id',
+                    ),
                   )
                 ),
             'createdAt' =>
@@ -139,7 +158,7 @@ class Category implements IModel
 
         $this->_modelName = 'Category';
         $this->_fieldsOnly = ['id', 'name', 'description', 'image', 'products', 'createdAt', 'updatedAt'];
-        $this->_fieldsRelated = ['ProductCategory'];
+        $this->_fieldsRelated = ['products', 'ProductCategory'];
 
         $this->_col = new class()
         {
@@ -298,6 +317,247 @@ class Category implements IModel
             }
         }
     }
+    protected function includeProducts(array $items, array $selectedFields = [], array $includeSelectedFields = [], bool $format = false) 
+    {
+        if (empty($items)) {
+            return $items;
+        }
+
+        $singleItem = false;
+        $itemsArrayType = Utility::checkArrayContents($items);
+        if ($itemsArrayType === ArrayType::Value) {
+            $items = [$items];
+            $singleItem = true;
+        }
+
+        $dbType = $this->_dbType;
+        $implicitTableName = $dbType == 'pgsql' ? "\"_CategoryToProduct\"" : "`_CategoryToProduct`";
+        $implicitModelName = $dbType == 'pgsql' ? "\"CategoryToProduct\"" : "`CategoryToProduct`";
+        $quotedTableName = $dbType == 'pgsql' ? "\"Category\"" : "`Category`";
+        $tableName = $dbType == 'pgsql' ? "\"Product\"" : "`Product`";
+        $modelName = 'Product';
+        $relationName = 'products';
+        $foreignKeyIds = array_column($items, 'id');
+        $primaryKey = 'id';
+        $foreignKey = 'id';
+        $implicitPrimaryKey = 'A';
+        $implicitForeignKey = 'B';
+        $primaryKeyQuoted = $dbType == 'pgsql' ? "\"id\"" : "`id`";
+        $foreignKeyQuoted = $dbType == 'pgsql' ? "\"id\"" : "`id`";
+        $implicitPrimaryKeyQuoted = $dbType == 'pgsql' ? "\"A\"" : "`A`";
+        $implicitForeignKeyQuoted = $dbType == 'pgsql' ? "\"B\"" : "`B`";
+        $foreignKeyIds = array_filter($foreignKeyIds); // Filter out any empty values
+        $foreignKeyIds = array_unique($foreignKeyIds);
+
+        $instanceModelName = new Product($this->_pdo);
+        $implicitInstanceModelName = new CategoryToProduct($this->_pdo);
+        $implicitRecords = $implicitInstanceModelName->findMany(['where' => [$implicitPrimaryKey => ['in' => $foreignKeyIds]]]);
+
+        if ($implicitRecords === false) {
+            echo "Error fetching records from $implicitTableName<br>";
+            return;
+        }
+
+        $relatedRecordsMap = [];
+        foreach ($foreignKeyIds as $id) {
+            $relatedRecordsMap[$id] = [];
+        }
+
+        foreach ($implicitRecords as $record) {
+            $aValue = $record[$implicitForeignKey];
+            $bValue = $record[$implicitPrimaryKey];
+            if (!isset($relatedRecordsMap[$bValue])) {
+                $relatedRecordsMap[$bValue] = [];
+            }
+            $relatedRecordsMap[$bValue][] = $aValue;
+        }
+
+        $completeRelatedRecordsMap = [];
+        foreach ($relatedRecordsMap as $foreignKeyValue => $aValues) {
+            if (!empty($aValues)) {
+                $uniqueAValues = array_unique($aValues);
+
+                $whereQuery = ['where' => [$foreignKey => ['in' => $uniqueAValues]]];
+                $mergeQuery = array_merge($whereQuery, $includeSelectedFields);
+                $relatedRecords = $instanceModelName->findMany($mergeQuery, $format);
+                $completeRelatedRecordsMap[$foreignKeyValue] = $relatedRecords;
+            } else {
+                $completeRelatedRecordsMap[$foreignKeyValue] = [];
+            }
+        }
+
+        // Process items
+        foreach ($items as &$item) {
+            if (!isset($item[$primaryKey])) {
+                $item[$relationName] = [];
+                continue;
+            }
+
+            $foreignKeyValue = $item[$primaryKey];
+            $item[$relationName] = $completeRelatedRecordsMap[$foreignKeyValue] ?? [];
+        }
+
+        return $singleItem ? reset($items) : $items;
+    }
+
+    protected function connectProducts(string $relationName, array $connectData, string $lastInsertId, string $connectType = 'connect')
+    {
+        $dbType = $this->_dbType;
+        $implicitTableName = $dbType == 'pgsql' ? "\"_CategoryToProduct\"" : "`_CategoryToProduct`";
+        $implicitModelName = $dbType == 'pgsql' ? "\"CategoryToProduct\"" : "`CategoryToProduct`";
+        $quotedTableName = $dbType == 'pgsql' ? "\"Category\"" : "`Category`";
+        $tableName = $dbType == 'pgsql' ? "\"Product\"" : "`Product`";
+        $modelName = 'Product';
+        $primaryKey = 'id';
+        $tablePrimaryKey = 'id';
+        $relatedForeignKey = 'id';
+        $relationType = 'ManyToMany';
+        $implicitPrimaryKey = 'A';
+        $implicitForeignKey = 'B';
+        $typeOfTableRelation = 'implicit';
+        $primaryKeyQuoted = $dbType == 'pgsql' ? "\"id\"" : "`id`";
+        $foreignKeyQuoted = $dbType == 'pgsql' ? "\"id\"" : "`id`";
+        $implicitPrimaryKeyQuoted = $dbType == 'pgsql' ? "\"A\"" : "`A`";
+        $implicitForeignKeyQuoted = $dbType == 'pgsql' ? "\"B\"" : "`B`";
+
+        if (!is_array($connectData) && $connectType !== 'disconnect') {
+            throw new \Exception("Error connecting $modelName: connectData must be an array");
+        }
+
+        if ($connectType === 'connectOrCreate' && (!array_key_exists('where', $connectData) || !array_key_exists('create', $connectData))) {
+            throw new \Exception("Error connecting $modelName: connectOrCreate requires both where and create keys");
+        }
+
+        $relationModel = new Product($this->_pdo);
+        $implicitRelationModel = new CategoryToProduct($this->_pdo);
+
+        if ($connectType === 'create') {
+            $dataToCreate = [$relatedForeignKey => $lastInsertId, ...$connectData];
+            $relationModel->create(['data' => $dataToCreate]);
+            return;
+        }
+
+        if ($connectType === 'createMany') {
+
+            if ($typeOfTableRelation === 'implicit' && $relationType !== 'OneToMany') {
+                throw new \Exception("Error connecting $modelName: createMany is only supported for OneToMany relations");
+            }
+
+            $dataToUpdate = array_map(function($data) use ($relatedForeignKey, $lastInsertId) {
+                $data[$relatedForeignKey] = $lastInsertId;
+                return $data;
+            }, $connectData);
+
+            $relationModel->createMany(['data' => $dataToUpdate]);
+            return;
+        }
+
+        if ($connectType === 'update' || $connectType === 'updateMany') {
+            if ($typeOfTableRelation === 'inverse' && $relationType === 'OneToMany' && !isset($connectData['where']) && !isset($connectData['data'])) {
+                throw new \Exception("Error connecting $modelName: OneToMany relation requires both where and data keys");
+            }
+
+            try {
+                if ($connectType === 'updateMany') {
+                    $where = isset($connectData['where']) ? $connectData['where'] : ['where' => $connectData];
+                    return $relationModel->updateMany($connectData);
+                }
+                return $relationModel->update($connectData);
+            } catch (\Exception $e) {
+                throw new \Exception("Error connecting $modelName: " . $e->getMessage());
+            }
+        }
+
+        $where = isset($connectData['where']) ? ['where' => [$implicitPrimaryKey => $connectData['where'][$relatedForeignKey]]] : ['where' => [$implicitPrimaryKey => $connectData[$relatedForeignKey]]];
+        $foundUnique = $implicitRelationModel->findUnique($where);
+
+        if (empty($foundUnique) && $connectType === 'connect') {
+            $getRelatedModelKey = $relationModel->findUnique(['where' => $connectData]);
+            if (!empty($getRelatedModelKey)) {
+                $data = ['data' => [$implicitPrimaryKey => $getRelatedModelKey[$relatedForeignKey], $implicitForeignKey => $lastInsertId]];
+                $implicitRelationModel->create($data);
+                return;
+            } else {
+                throw new \Exception("Error connecting $modelName: No record found for connectData");
+            }
+        }
+
+        if (empty($foundUnique) && $connectType === 'connectOrCreate') {
+            $getRelatedForeignKey = $relationModel->findUnique(['where' => $connectData['where']]);
+
+            if (empty($getRelatedForeignKey)) {
+                $getRelatedForeignKey = $relationModel->create(['data' => $connectData['create']]);
+            }
+
+            $data = ['data' => [$implicitPrimaryKey => $getRelatedForeignKey[$relatedForeignKey], $implicitForeignKey => $lastInsertId]];
+            $foundUnique = $implicitRelationModel->create($data);
+        } else if (!empty($foundUnique) && $connectType === 'connectOrCreate') {
+            try {
+                $where = ['where' => [$implicitPrimaryKey => $foundUnique[$implicitPrimaryKey], $implicitForeignKey => $lastInsertId]];
+                $checkIfExist = $implicitRelationModel->findFirst($where);
+
+                if (empty($checkIfExist)) {
+                    $data = ['data' => [$implicitPrimaryKey => $foundUnique[$implicitPrimaryKey], $implicitForeignKey => $lastInsertId]];
+                    $foundUnique = $implicitRelationModel->create($data);
+                } else {
+                    $data = ['where' => [$implicitPrimaryKey => $foundUnique[$implicitPrimaryKey]], 'data' => [$implicitForeignKey => $lastInsertId]];
+                    $foundUnique = $implicitRelationModel->update($data);
+                }
+            } catch (\Exception $e) {
+                throw new \Exception("Error connecting categories: " . $e->getMessage());
+            }
+        }
+
+        if (!empty($foundUnique) && $connectType === 'connect') {
+            try {
+                $whereCondition = [
+                    'where' => [
+                        $implicitPrimaryKey => $foundUnique[$implicitPrimaryKey],
+                        'AND' => [$implicitForeignKey => $lastInsertId]
+                    ],
+                ];
+
+                $checkIfExist = $implicitRelationModel->findFirst($whereCondition);
+
+                if (empty($checkIfExist)) {
+                    $data = [
+                        'data' => [
+                            $implicitPrimaryKey => $foundUnique[$implicitPrimaryKey],
+                            $implicitForeignKey => $lastInsertId
+                        ]
+                    ];
+                    $foundUnique = $implicitRelationModel->create($data);
+                }
+            } catch (\Exception $e) {
+                throw new \Exception("Error connecting products: " . $e->getMessage());
+            }
+        }
+
+        if (!empty($foundUnique) && $connectType === 'disconnect') {
+            try {
+                $whereCondition = [
+                    'where' => [
+                        $implicitPrimaryKey => $foundUnique[$implicitPrimaryKey],
+                        'AND' => [$implicitForeignKey => $lastInsertId]
+                    ],
+                ];
+
+                $checkIfExist = $implicitRelationModel->findFirst($whereCondition);
+
+                if (!empty($checkIfExist)) {
+                    $whereCondition = [
+                        'where' => [
+                            $implicitPrimaryKey => $foundUnique[$implicitPrimaryKey],
+                            $implicitForeignKey => $lastInsertId
+                        ]
+                    ];
+                    $foundUnique = $implicitRelationModel->delete($whereCondition);
+                }
+            } catch (\Exception $e) {
+                throw new \Exception("Error disconnecting products: " . $e->getMessage());
+            }
+        }
+    }
     
     /**
      * Creates a new User in the database.
@@ -377,7 +637,6 @@ class Category implements IModel
 
         $requiredFieldsMap = [
             'name' => 'String',
-            'products' => 'Product',
         ];
         foreach ($requiredFieldsMap as $fieldName => $fieldType) {
             if (!isset($data['data'][$fieldName])) {
@@ -388,7 +647,7 @@ class Category implements IModel
         $select = $data['select'] ?? [];
         $include = $data['include'] ?? [];
         $data = $data['data'];
-        $relationNames = ['ProductCategory'];
+        $relationNames = ['products', 'ProductCategory'];
 
         $primaryKeyField = '';
         $insertFields = [];
@@ -413,7 +672,7 @@ class Category implements IModel
                     $primaryKeyField = $fieldName;
                 }
 
-                if (isset($field['decorators']['default']) && isset($field['decorators']['id'])) {
+                if (isset($field['decorators']['default'])) {
                     if (empty($data[$fieldName])) {
                         if ($field['decorators']['default'] === 'uuid') {
                             $bindings[$fieldName] = \Ramsey\Uuid\Uuid::uuid4()->toString();
@@ -642,7 +901,6 @@ class Category implements IModel
 
         $requiredFieldsMap = [
             'name' => 'String',
-            'products' => 'Product',
         ];
         foreach ($data['data'] as $item) {
             foreach ($requiredFieldsMap as $fieldName => $fieldType) {
@@ -673,7 +931,7 @@ class Category implements IModel
                 $inverseRelation = $field['decorators']['inverseRelation'] ?? null;
                 $implicitRelation = $field['decorators']['implicitRelation'] ?? null;
     
-                if (!empty($field['decorators']['id'])) {
+                if (isset($field['decorators']['default'])) {
                     if (empty($item[$fieldName])) {
                         if ($field['decorators']['default'] === 'uuid') {
                             $item[$fieldName] = \Ramsey\Uuid\Uuid::uuid4()->toString();
@@ -808,7 +1066,7 @@ class Category implements IModel
         $dbType = $this->_dbType;
         $quotedTableName = $dbType == 'pgsql' ? "\"Category\"" : "`Category`";
 
-        $relationNames = ['ProductCategory'];
+        $relationNames = ['products', 'ProductCategory'];
 
         $timestamp = "";
         if (!isset($select[$tablePrimaryKey])) {
@@ -959,7 +1217,7 @@ class Category implements IModel
         $dbType = $this->_dbType;
         $quotedTableName = $dbType == 'pgsql' ? "\"Category\"" : "`Category`";
 
-        $relationNames = ['ProductCategory'];
+        $relationNames = ['products', 'ProductCategory'];
 
         $timestamp = "";
         if (!isset($select[$tablePrimaryKey])) {
@@ -1139,7 +1397,7 @@ class Category implements IModel
         $dbType = $this->_dbType;
         $quotedTableName = $dbType == 'pgsql' ? "\"Category\"" : "`Category`";
 
-        $relationNames = ['ProductCategory'];
+        $relationNames = ['products', 'ProductCategory'];
 
         $timestamp = "";
         if (!isset($select[$tablePrimaryKey])) {
@@ -1319,7 +1577,6 @@ class Category implements IModel
 
         $requiredFieldsMap = [
             'name' => 'String',
-            'products' => 'Product',
         ];
         foreach ($requiredFieldsMap as $fieldName => $fieldType) {
             if (isset($data['data'][$fieldName]) && empty($data['data'][$fieldName])) {
@@ -1331,7 +1588,7 @@ class Category implements IModel
         $select = $data['select'] ?? [];
         $include = $data['include'] ?? [];
         $data = $data['data'];
-        $relationNames = ['ProductCategory'];
+        $relationNames = ['products', 'ProductCategory'];
 
         $dbType = $this->_dbType;
         $quotedTableName = $dbType == 'pgsql' ? "\"Category\"" : "`Category`";
@@ -1929,7 +2186,6 @@ class Category implements IModel
 
         $requiredFieldsMap = [
             'name' => 'String',
-            'products' => 'Product',
         ];
         foreach ($data['data'] as $item) {
             foreach ($requiredFieldsMap as $fieldName => $fieldType) {

@@ -1,3 +1,26 @@
+<?php
+
+use Lib\Prisma\Classes\Prisma;
+use Lib\Auth\Auth;
+
+$prisma = new Prisma();
+$auth = new Auth();
+
+$userId = $auth->getPayload()->id ?? null;
+
+$cartItems = $prisma->cart->findMany([
+    'where' => [
+        'userId' => $userId
+    ],
+    'include' => ['items' => true],
+], true);
+
+echo "<pre>";
+print_r($cartItems);
+echo "</pre>";
+
+?>
+
 <div class="small-container cart-page">
     <table>
         <tr>

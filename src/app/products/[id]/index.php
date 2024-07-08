@@ -1,9 +1,13 @@
 <?php
 
 use Lib\Prisma\Classes\Prisma;
+use Lib\Auth\Auth;
+use Lib\Validator;
 
 $prisma = new Prisma();
+$auth = new Auth();
 
+$userId = $auth->getPayload()->id ?? null;
 $id = $dynamicRouteParams->id;
 $product = null;
 $relatedProducts = null;
@@ -41,10 +45,27 @@ if (!empty($id)) {
 
 function addToCart($data)
 {
-    return $data;
-    // $cart = $_SESSION['cart'] ?? [];
-    // $cart[] = $product;
-    // $_SESSION['cart'] = $cart;
+    global $id, $prisma, $userId;
+
+    $quantity = $data->quantity;
+    if (Validator::int($quantity)) {
+        $quantity = $data->quantity;
+    } else {
+        echo "Cantidad no válida";
+        return;
+    }
+
+    $prisma->cart->create([
+        'data' => [
+            'userId' => $userId,
+            'items' => [
+                'create' => [
+                    'productId' => $id,
+                    'quantity' => $quantity
+                ]
+            ]
+        ]
+    ]);
 }
 
 ?>
@@ -79,10 +100,10 @@ function addToCart($data)
                 <option></option>
                 <option></option>
             </select>
-            <!-- 
-            <form id="add-to-cart" onsubmit="addToCart"> -->
-            <input type="number" value="1" oninput="addToCart">
-            <!-- </form> -->
+
+            <form id="add-to-cart" onsubmit="addToCart">
+                <input type="number" name="quantity" value="1">
+            </form>
             <button form="add-to-cart" class="btn">Añadir al carrito
                 <span></span>
                 <span></span>
