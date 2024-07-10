@@ -3,7 +3,6 @@
 use Lib\Prisma\Classes\Prisma;
 use Lib\Auth\Auth;
 use Lib\Validator;
-use Lib\StateManager;
 
 $prisma = new Prisma();
 $auth = new Auth();
@@ -37,43 +36,73 @@ if (!empty($id)) {
         ], true);
     } else {
         echo "Producto no encontrado";
-        exit;
     }
 } else {
     echo "Producto no encontrado";
-    exit;
 }
 
 function addToCart($data)
 {
-    global $id, $prisma, $userId;
-    $state = new StateManager();
+    global $prisma, $userId, $id;
 
-    if (empty($userId)) {
-        redirect("/account");
-    }
+    if (empty($userId)) redirect('/account');
 
     $quantity = $data->quantity;
-    if (Validator::int($quantity)) {
-        $quantity = $data->quantity;
-    } else {
-        echo "Cantidad no válida";
-        return;
+    if (!Validator::int($quantity))
+        return 'La cantidad debe ser un número entero';
+
+    try {
+        $cart = $prisma->cart->findFirst([
+            'where' => [
+                'userId' => $userId,
+                'payed' => false
+            ]
+        ], true);
+
+        if (!$cart) {
+            $prisma->cart->create([
+                'data' => [
+                    'userId' => $userId,
+                    'items' => [
+                        'create' => [
+                            'productId' => $id,
+                            'quantity' => $quantity
+                        ]
+                    ]
+                ]
+            ]);
+        } else {
+            $cartItem = $prisma->cartItem->findFirst([
+                'where' => [
+                    'cartId' => $cart->id,
+                    'productId' => $id
+                ]
+            ], true);
+
+            if ($cartItem) {
+                $prisma->cartItem->update([
+                    'where' => [
+                        'id' => $cartItem->id
+                    ],
+                    'data' => [
+                        'quantity' => $cartItem->quantity + $quantity
+                    ]
+                ]);
+            } else {
+                $prisma->cartItem->create([
+                    'data' => [
+                        'cartId' => $cart->id,
+                        'productId' => $id,
+                        'quantity' => $quantity
+                    ]
+                ]);
+            }
+        }
+    } catch (\Exception $e) {
+        echo $e->getMessage();
     }
 
-    $prisma->cart->create([
-        'data' => [
-            'userId' => $userId,
-            'items' => [
-                'create' => [
-                    'productId' => $id,
-                    'quantity' => $quantity
-                ]
-            ]
-        ]
-    ], true);
-
-    redirect("/cart");
+    redirect('/cart');
 }
 
 ?>

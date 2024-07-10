@@ -38,6 +38,7 @@ class ProductCategory implements IModel
                     'id' => true,
                     'unique' => true,
                     'default' => 'String',
+                    'isRelation' => true,
                     'composite' => true,
                   )
                 ),
@@ -52,6 +53,7 @@ class ProductCategory implements IModel
                     'id' => true,
                     'unique' => true,
                     'default' => 'String',
+                    'isRelation' => true,
                     'composite' => true,
                   )
                 ),
@@ -948,7 +950,7 @@ class ProductCategory implements IModel
         $where = $criteria['where'];
         $select = $criteria['select'] ?? [];
         $include = $criteria['include'] ?? [];
-        $tablePrimaryKey = 'categoryId';
+        $tablePrimaryKey = '';
         $primaryEntityFields = [];
         $relatedEntityFields = [];
         $includes = [];
@@ -1559,7 +1561,7 @@ class ProductCategory implements IModel
                 $stmt->execute();
             }
 
-            $primaryKeyValue = $this->findUnique(['where' => $where])[$primaryKeyField] ?? null;
+            $primaryKeyValue = $this->findFirst(['where' => $where])[$primaryKeyField] ?? null;
 
             if (!empty($relationNames)) {
                 foreach ($data as $relationName => $relationDataName) {
@@ -1677,7 +1679,7 @@ class ProductCategory implements IModel
             }
             $selectedFields = array_merge($select, $include);
 
-            $result = $this->findUnique(['where' => $where, $selectOrInclude => $selectedFields], $format);
+            $result = $this->findFirst(['where' => $where, $selectOrInclude => $selectedFields], $format);
             $this->_pdo->commit();
             return $result;
         } catch (\Exception $e) {

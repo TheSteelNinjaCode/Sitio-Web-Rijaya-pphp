@@ -8,6 +8,7 @@ use Lib\Validator;
 class Cart implements IModel
 {
     public $id;
+    public $payed;
     public $createdAt;
     public $updatedAt;
     public $userId;
@@ -40,6 +41,17 @@ class Cart implements IModel
                     'unique' => true,
                     'id' => true,
                     'default' => 'cuid',
+                  )
+                ),
+            'payed' =>
+            array(
+                'name' => 'payed',
+                'type' => 'Boolean',
+                'isNullable' => '',
+                'isPrimaryKey' => '',
+                'decorators' =>
+                array (
+                    'default' => true,
                   )
                 ),
             'createdAt' =>
@@ -136,13 +148,14 @@ class Cart implements IModel
             );
 
         $this->_modelName = 'Cart';
-        $this->_fieldsOnly = ['id', 'createdAt', 'updatedAt', 'userId'];
+        $this->_fieldsOnly = ['id', 'payed', 'createdAt', 'updatedAt', 'userId'];
         $this->_fieldsRelated = ['user', 'items'];
 
         $this->_col = new class()
         {
             public function __construct(
                 public readonly string $id = 'id',
+                public readonly string $payed = 'payed',
                 public readonly string $createdAt = 'createdAt',
                 public readonly string $updatedAt = 'updatedAt',
                 public readonly string $userId = 'userId',
@@ -154,6 +167,7 @@ class Cart implements IModel
 
         if ($data) {
             $this->id = $data['id'] ?? null;
+            $this->payed = $data['payed'] ?? null;
             $this->createdAt = $data['createdAt'] ?? null;
             $this->updatedAt = $data['updatedAt'] ?? null;
             $this->userId = $data['userId'] ?? null;
@@ -959,7 +973,7 @@ class Cart implements IModel
         $where = $criteria['where'];
         $select = $criteria['select'] ?? [];
         $include = $criteria['include'] ?? [];
-        $tablePrimaryKey = 'id';
+        $tablePrimaryKey = '';
         $primaryEntityFields = [];
         $relatedEntityFields = [];
         $includes = [];
@@ -1576,7 +1590,7 @@ class Cart implements IModel
                 $stmt->execute();
             }
 
-            $primaryKeyValue = $this->findUnique(['where' => $where])[$primaryKeyField] ?? null;
+            $primaryKeyValue = $this->findFirst(['where' => $where])[$primaryKeyField] ?? null;
 
             if (!empty($relationNames)) {
                 foreach ($data as $relationName => $relationDataName) {
@@ -1694,7 +1708,7 @@ class Cart implements IModel
             }
             $selectedFields = array_merge($select, $include);
 
-            $result = $this->findUnique(['where' => $where, $selectOrInclude => $selectedFields], $format);
+            $result = $this->findFirst(['where' => $where, $selectOrInclude => $selectedFields], $format);
             $this->_pdo->commit();
             return $result;
         } catch (\Exception $e) {

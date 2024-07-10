@@ -79,6 +79,7 @@ model ProductCategory {
 
 model Cart {
   id        String   @id @default(cuid())
+  payed     Boolean  @default(false)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 

@@ -38,10 +38,10 @@ class CartItem implements IModel
                 'isNullable' => '',
                 'isPrimaryKey' => '',
                 'decorators' =>
-                array(
+                array (
                     'default' => 'cuid',
-                )
-            ),
+                  )
+                ),
             'quantity' =>
             array(
                 'name' => 'quantity',
@@ -49,8 +49,9 @@ class CartItem implements IModel
                 'isNullable' => '',
                 'isPrimaryKey' => '',
                 'decorators' =>
-                array()
-            ),
+                array (
+                  )
+                ),
             'createdAt' =>
             array(
                 'name' => 'createdAt',
@@ -58,10 +59,10 @@ class CartItem implements IModel
                 'isNullable' => '',
                 'isPrimaryKey' => '',
                 'decorators' =>
-                array(
+                array (
                     'default' => 'now',
-                )
-            ),
+                  )
+                ),
             'updatedAt' =>
             array(
                 'name' => 'updatedAt',
@@ -69,10 +70,10 @@ class CartItem implements IModel
                 'isNullable' => '',
                 'isPrimaryKey' => '',
                 'decorators' =>
-                array(
+                array (
                     'updatedAt' => true,
-                )
-            ),
+                  )
+                ),
             'cartId' =>
             array(
                 'name' => 'cartId',
@@ -80,13 +81,14 @@ class CartItem implements IModel
                 'isNullable' => '',
                 'isPrimaryKey' => '1',
                 'decorators' =>
-                array(
+                array (
                     'id' => true,
                     'unique' => true,
                     'default' => 'String',
+                    'isRelation' => true,
                     'composite' => true,
-                )
-            ),
+                  )
+                ),
             'productId' =>
             array(
                 'name' => 'productId',
@@ -94,13 +96,14 @@ class CartItem implements IModel
                 'isNullable' => '',
                 'isPrimaryKey' => '1',
                 'decorators' =>
-                array(
+                array (
                     'id' => true,
                     'unique' => true,
                     'default' => 'String',
+                    'isRelation' => true,
                     'composite' => true,
-                )
-            ),
+                  )
+                ),
             'cart' =>
             array(
                 'name' => 'cart',
@@ -108,29 +111,29 @@ class CartItem implements IModel
                 'isNullable' => '',
                 'isPrimaryKey' => '',
                 'decorators' =>
-                array(
-                    'relation' =>
-                    array(
-                        'name' => 'cart',
-                        'model' => 'Cart',
-                        'relationModelName' => 'Cart',
-                        'fields' =>
-                        array(
-                            0 => 'cartId',
-                        ),
-                        'references' =>
-                        array(
-                            0 => 'id',
-                        ),
-                        'onDelete' => 'SetNull',
-                        'onUpdate' => 'Cascade',
-                        'type' => 'OneToMany',
-                        'tableName' => 'CartItem',
-                        'tableModelName' => 'CartItem',
-                        'tablePrimaryKey' => 'id',
+                array (
+                    'relation' => 
+                    array (
+                      'name' => 'cart',
+                      'model' => 'Cart',
+                      'relationModelName' => 'Cart',
+                      'fields' => 
+                      array (
+                        0 => 'cartId',
+                      ),
+                      'references' => 
+                      array (
+                        0 => 'id',
+                      ),
+                      'onDelete' => 'SetNull',
+                      'onUpdate' => 'Cascade',
+                      'type' => 'OneToMany',
+                      'tableName' => 'CartItem',
+                      'tableModelName' => 'CartItem',
+                      'tablePrimaryKey' => 'id',
                     ),
-                )
-            ),
+                  )
+                ),
             'product' =>
             array(
                 'name' => 'product',
@@ -138,30 +141,30 @@ class CartItem implements IModel
                 'isNullable' => '',
                 'isPrimaryKey' => '',
                 'decorators' =>
-                array(
-                    'relation' =>
-                    array(
-                        'name' => 'product',
-                        'model' => 'Product',
-                        'relationModelName' => 'Product',
-                        'fields' =>
-                        array(
-                            0 => 'productId',
-                        ),
-                        'references' =>
-                        array(
-                            0 => 'id',
-                        ),
-                        'onDelete' => 'SetNull',
-                        'onUpdate' => 'Cascade',
-                        'type' => 'OneToMany',
-                        'tableName' => 'CartItem',
-                        'tableModelName' => 'CartItem',
-                        'tablePrimaryKey' => 'id',
+                array (
+                    'relation' => 
+                    array (
+                      'name' => 'product',
+                      'model' => 'Product',
+                      'relationModelName' => 'Product',
+                      'fields' => 
+                      array (
+                        0 => 'productId',
+                      ),
+                      'references' => 
+                      array (
+                        0 => 'id',
+                      ),
+                      'onDelete' => 'SetNull',
+                      'onUpdate' => 'Cascade',
+                      'type' => 'OneToMany',
+                      'tableName' => 'CartItem',
+                      'tableModelName' => 'CartItem',
+                      'tablePrimaryKey' => 'id',
                     ),
-                )
-            ),
-        );
+                  )
+                ),
+            );
 
         $this->_modelName = 'CartItem';
         $this->_fieldsOnly = ['id', 'quantity', 'createdAt', 'updatedAt', 'cartId', 'productId'];
@@ -194,7 +197,7 @@ class CartItem implements IModel
         }
     }
 
-    protected function includeCart(array $items, array $selectedFields = [], array $includeSelectedFields = [], bool $format = false)
+    protected function includeCart(array $items, array $selectedFields = [], array $includeSelectedFields = [], bool $format = false) 
     {
         if (empty($items)) {
             return $items;
@@ -361,7 +364,7 @@ class CartItem implements IModel
         }
     }
 
-    protected function includeProduct(array $items, array $selectedFields = [], array $includeSelectedFields = [], bool $format = false)
+    protected function includeProduct(array $items, array $selectedFields = [], array $includeSelectedFields = [], bool $format = false) 
     {
         if (empty($items)) {
             return $items;
@@ -528,7 +531,7 @@ class CartItem implements IModel
         }
     }
 
-
+    
     /**
      * Creates a new User in the database.
      *
@@ -587,7 +590,7 @@ class CartItem implements IModel
      * - Transaction management is utilized to ensure that all database operations are executed
      *   atomically, rolling back changes in case of any error, thus maintaining data consistency.
      */
-    public function create(array $data, bool $format = false): array | object
+    public function create(array $data, bool $format = false): array | object 
     {
         if (!isset($data['data'])) {
             throw new \Exception("The 'data' key is required when creating a new CartItem.");
@@ -613,7 +616,7 @@ class CartItem implements IModel
                 throw new \Exception("The '$fieldName' field of type '$fieldType' is required when creating a new CartItem.");
             }
         }
-
+        
         $select = $data['select'] ?? [];
         $include = $data['include'] ?? [];
         $data = $data['data'];
@@ -749,31 +752,31 @@ class CartItem implements IModel
                         if (isset($relationDataName['connect']) && isset($relationDataName['connectOrCreate'])) {
                             throw new \Exception("You can't use both 'connect' and 'connectOrCreate' at the same time.");
                         }
-
+    
                         if (isset($relationDataName['connect']) && isset($relationDataName['disconnect'])) {
                             throw new \Exception("You can't use both 'connect' and 'disconnect' at the same time.");
                         }
 
                         if (isset($relationDataName['connect']) || isset($relationDataName['connectOrCreate'])) {
-
+    
                             if (isset($relationDataName['connect'])) {
                                 $connectData = $relationDataName['connect'];
                                 $checkArrayContentType = Utility::checkArrayContents($connectData);
-
+    
                                 if (isset($relationDataName['connect']) && $checkArrayContentType !== ArrayType::Value) {
                                     throw new \Exception("The 'connect' key must be an associative array with the field names as keys and the data to create as values related '$relationName' model. example: ['connect' => ['id' => 'someId']]");
                                 }
                             }
-
+    
                             if (isset($relationDataName['connectOrCreate'])) {
                                 $connectOrCreateData = $relationDataName['connectOrCreate'];
                                 $checkArrayContentType = Utility::checkArrayContents($connectOrCreateData);
-
+    
                                 if (isset($relationDataName['connectOrCreate']) && $checkArrayContentType !== ArrayType::Associative) {
                                     throw new \Exception("The 'connectOrCreate' key must be an associative array with the field names as keys and the data to create as values related '$relationName' model. example: ['connectOrCreate' => ['where' => ['id' => 'someId'], 'create' => ['name' => 'someName']]");
                                 }
                             }
-
+    
                             if (isset($relationDataName['disconnect'])) {
                                 throw new \Exception("The 'disconnect' key is not allowed in the create method.");
                             }
@@ -900,7 +903,7 @@ class CartItem implements IModel
                 $relation = $field['decorators']['relation'] ?? null;
                 $inverseRelation = $field['decorators']['inverseRelation'] ?? null;
                 $implicitRelation = $field['decorators']['implicitRelation'] ?? null;
-
+    
                 if (isset($field['decorators']['default'])) {
                     if (empty($item[$fieldName])) {
                         if ($field['decorators']['default'] === 'uuid') {
@@ -926,7 +929,7 @@ class CartItem implements IModel
                     }
                     $placeholders[] = "NULL";
                 }
-
+    
                 if (array_key_exists($fieldName, $item)) {
                     if (isset($relation) || isset($inverseRelation)) continue;
                     $placeholders[] = ":{$fieldName}_{$index}";
@@ -937,7 +940,7 @@ class CartItem implements IModel
                     }
                 }
             }
-
+    
             $allPlaceholders[] = '(' . implode(', ', $placeholders) . ')';
             $index++;
         }
@@ -1028,7 +1031,7 @@ class CartItem implements IModel
         $where = $criteria['where'];
         $select = $criteria['select'] ?? [];
         $include = $criteria['include'] ?? [];
-        $tablePrimaryKey = 'productId';
+        $tablePrimaryKey = '';
         $primaryEntityFields = [];
         $relatedEntityFields = [];
         $includes = [];
@@ -1064,7 +1067,7 @@ class CartItem implements IModel
         $sql = "SELECT $selectFields FROM $quotedTableName WHERE ";
         $conditions = [];
         $bindings = [];
-
+        
         if (isset($where['cartId'])) {
             $conditions[] = "cartId = :cartId";
             $validatedValue = Validator::string($where['cartId']);
@@ -1272,7 +1275,7 @@ class CartItem implements IModel
                 } else {
                     $selectedFields = $relatedField;
                 }
-
+                
                 $includeMethodName = "include" . ucfirst($relation);
                 if (method_exists($this, $includeMethodName)) {
                     $items = $this->$includeMethodName($items, $select, $selectedFields, $format);
@@ -1396,7 +1399,7 @@ class CartItem implements IModel
             }, $primaryEntityFields);
             $selectFields = implode(', ', $formattedFields);
         }
-
+        
         $sql = "SELECT $distinct $selectFields FROM $quotedTableName";
         $conditions = [];
         $bindings = [];
@@ -1439,7 +1442,7 @@ class CartItem implements IModel
         if (!$record) {
             return [];
         }
-
+        
         foreach ($relatedEntityFields as $relation => $fields) {
             if (!isset($includes[$relation])) {
                 $includes[$relation] = true; // Implicitly include this relation
@@ -1454,7 +1457,7 @@ class CartItem implements IModel
                 } else {
                     $selectedFields = $relatedField;
                 }
-
+                
                 $includeMethodName = "include" . ucfirst($relation);
                 if (method_exists($this, $includeMethodName)) {
                     $record = $this->$includeMethodName($record, $select, $selectedFields, $format);
@@ -1570,7 +1573,7 @@ class CartItem implements IModel
         $sql = "UPDATE $quotedTableName SET ";
         $updateFields = [];
         $bindings = [];
-        $primaryKeyField = '';
+        $primaryKeyField = '';    
 
         Utility::checkFieldsExist(array_merge($data, $select, $include), $this->_fields, $this->_modelName);
 
@@ -1600,7 +1603,7 @@ class CartItem implements IModel
                     }
                 }
             }
-
+            
             if (!empty($updateFields)) {
                 $sql .= implode(', ', $updateFields);
 
@@ -1650,7 +1653,7 @@ class CartItem implements IModel
                 $stmt->execute();
             }
 
-            $primaryKeyValue = $this->findUnique(['where' => $where])[$primaryKeyField] ?? null;
+            $primaryKeyValue = $this->findFirst(['where' => $where])[$primaryKeyField] ?? null;
 
             if (!empty($relationNames)) {
                 foreach ($data as $relationName => $relationDataName) {
@@ -1768,7 +1771,7 @@ class CartItem implements IModel
             }
             $selectedFields = array_merge($select, $include);
 
-            $result = $this->findUnique(['where' => $where, $selectOrInclude => $selectedFields], $format);
+            $result = $this->findFirst(['where' => $where, $selectOrInclude => $selectedFields], $format);
             $this->_pdo->commit();
             return $result;
         } catch (\Exception $e) {
@@ -2097,13 +2100,13 @@ class CartItem implements IModel
      * @return array An array of results with grouped data.
      * @throws \Exception Throws an exception if the database operation fails.
      */
-    public function groupBy(array $criteria, bool $format = false): array | object
+    public function groupBy(array $criteria, bool $format = false): array | object 
     {
         $aggregates = $criteria['aggregates'] ?? [];
         $dbType = $this->_pdo->getAttribute(\PDO::ATTR_DRIVER_NAME);
         $quotedTableName = $dbType == 'pgsql' ? "\"CartItem\"" : "`CartItem`";
         $groupByFields = implode(', ', $criteria);
-        $aggregateFields = array_map(fn ($a) => "{$a['function']}({$a['field']}) AS {$a['alias']}", $aggregates);
+        $aggregateFields = array_map(fn($a) => "{$a['function']}({$a['field']}) AS {$a['alias']}", $aggregates);
         $sql = "SELECT $groupByFields, " . implode(', ', $aggregateFields) . " FROM $quotedTableName GROUP BY $groupByFields";
 
         $stmt = $this->_pdo->prepare($sql);
@@ -2213,42 +2216,42 @@ class CartItem implements IModel
             $sql .= implode(', ', $updateFields);
 
             if (!empty($where)) {
-                $whereClauses = [];
+                    $whereClauses = [];
 
-                foreach ($where as $fieldName => $fieldValue) {
-                    // Handle logical operators AND, OR, NOT
-                    if (in_array(strtoupper($fieldName), ['AND', 'OR', 'NOT'])) {
-                        if (is_array($fieldValue)) {
-                            $subClauses = [];
-                            foreach ($fieldValue as $subField => $subValue) {
-                                if (array_key_exists($subField, $this->_fields)) {
-                                    $subClauses[] = "$subField = :where_$subField";
-                                    $bindings[":where_$subField"] = $subValue;
-                                } else {
-                                    throw new \Exception("The '$subField' field does not exist in the CartItem model.");
+                    foreach ($where as $fieldName => $fieldValue) {
+                        // Handle logical operators AND, OR, NOT
+                        if (in_array(strtoupper($fieldName), ['AND', 'OR', 'NOT'])) {
+                            if (is_array($fieldValue)) {
+                                $subClauses = [];
+                                foreach ($fieldValue as $subField => $subValue) {
+                                    if (array_key_exists($subField, $this->_fields)) {
+                                        $subClauses[] = "$subField = :where_$subField";
+                                        $bindings[":where_$subField"] = $subValue;
+                                    } else {
+                                        throw new \Exception("The '$subField' field does not exist in the CartItem model.");
+                                    }
                                 }
-                            }
 
-                            $operator = strtoupper($fieldName);
-                            $whereClauses[] = $operator . ' (' . implode(' AND ', $subClauses) . ')';
+                                $operator = strtoupper($fieldName);
+                                $whereClauses[] = $operator . ' (' . implode(' AND ', $subClauses) . ')';
+                            } else {
+                                throw new \Exception("The '$fieldName' operator must be followed by an array of conditions.");
+                            }
                         } else {
-                            throw new \Exception("The '$fieldName' operator must be followed by an array of conditions.");
-                        }
-                    } else {
-                        // Normal field check
-                        if (array_key_exists($fieldName, $this->_fields)) {
-                            $whereClauses[] = "$fieldName = :where_$fieldName";
-                            $bindings[":where_$fieldName"] = $fieldValue;
-                        } else {
-                            throw new \Exception("The '$fieldName' field does not exist in the CartItem model.");
+                            // Normal field check
+                            if (array_key_exists($fieldName, $this->_fields)) {
+                                $whereClauses[] = "$fieldName = :where_$fieldName";
+                                $bindings[":where_$fieldName"] = $fieldValue;
+                            } else {
+                                throw new \Exception("The '$fieldName' field does not exist in the CartItem model.");
+                            }
                         }
                     }
-                }
 
-                if (!empty($whereClauses)) {
-                    $sql .= " WHERE " . implode(' AND ', $whereClauses);
+                    if (!empty($whereClauses)) {
+                        $sql .= " WHERE " . implode(' AND ', $whereClauses);
+                    }
                 }
-            }
 
             $stmt = $this->_pdo->prepare($sql);
             foreach ($bindings as $key => $value) {
@@ -2305,7 +2308,7 @@ class CartItem implements IModel
 ";
      * echo "Number of affected rows: " . $result['affectedRows'];
      */
-    public function deleteMany(array $criteria, bool $format = false): array | object
+    public function deleteMany(array $criteria, bool $format = false): array | object 
     {
         if (!isset($criteria['where'])) {
             throw new \Exception("The 'where' key is required in the deleteMany User.");
@@ -2381,7 +2384,7 @@ class CartItem implements IModel
         $select = $criteria['select'] ?? [];
         $dbType = $this->_dbType;
         $quotedTableName = $dbType === 'pgsql' ? "\"CartItem\"" : "`CartItem`";
-
+        
         $selectedFields = 'COUNT(*)';
         if (!empty($select)) {
             $selectedFields = '';

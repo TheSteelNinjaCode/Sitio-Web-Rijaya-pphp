@@ -442,7 +442,7 @@ class CategoryToProduct implements IModel
         $where = $criteria['where'];
         $select = $criteria['select'] ?? [];
         $include = $criteria['include'] ?? [];
-        $tablePrimaryKey = 'B';
+        $tablePrimaryKey = '';
         $primaryEntityFields = [];
         $relatedEntityFields = [];
         $includes = [];
@@ -1058,7 +1058,7 @@ class CategoryToProduct implements IModel
             }
             $selectedFields = array_merge($select, $include);
 
-            $result = $this->findUnique(['where' => $where, $selectOrInclude => $selectedFields], $format);
+            $result = $this->findFirst(['where' => $where, $selectOrInclude => $selectedFields], $format);
             $this->_pdo->commit();
             return $result;
         } catch (\Exception $e) {

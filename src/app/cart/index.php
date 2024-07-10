@@ -3,16 +3,20 @@
 use Lib\Prisma\Classes\Prisma;
 use Lib\Auth\Auth;
 use Lib\StateManager;
+use Lib\Validator;
 
 $prisma = new Prisma();
 $auth = new Auth();
 $state = new StateManager();
 
 $userId = $auth->getPayload()->id ?? null;
+$subtotal = 0;
+$taxRate = 0.175; // For example, 17.5% tax
 
 $cartItems = $prisma->cart->findMany([
     'where' => [
-        'userId' => $userId
+        'userId' => $userId,
+        'payed' => false
     ],
     'include' => [
         'items' => [
@@ -38,9 +42,6 @@ foreach ($cartItems as $cart) {
     }
 }
 
-$subtotal = 0;
-$taxRate = 0.175; // For example, 17.5% tax
-
 foreach ($products as $product) {
     $subtotal += $product['price'] * $product['quantity'];
 }
@@ -54,6 +55,44 @@ function removeProduct($data)
     $prisma->cartItem->delete([
         'where' => [
             'id' => $data->itemId,
+        ]
+    ]);
+}
+
+function updateQuantity($data)
+{
+    global $prisma;
+
+    if (!Validator::int($data->quantity))
+        return 'La cantidad debe ser un número entero';
+
+    $prisma->cartItem->update([
+        'where' => [
+            'id' => $data->itemId,
+        ],
+        'data' => [
+            'quantity' => $data->quantity,
+        ]
+    ]);
+}
+
+function payInvoice()
+{
+    global $prisma, $userId;
+
+    $cart = $prisma->cart->findFirst([
+        'where' => [
+            'userId' => $userId,
+            'payed' => false
+        ]
+    ], true);
+
+    $prisma->cart->update([
+        'where' => [
+            'id' => $cart->id
+        ],
+        'data' => [
+            'payed' => true
         ]
     ]);
 }
@@ -79,7 +118,7 @@ function removeProduct($data)
                         </div>
                     </div>
                 </td>
-                <td><input type="number" value="<?= $product['quantity'] ?>"></td>
+                <td><input id="<?= $product['itemId'] ?>" oninput="updateQuantity({'itemId': '<?= $product['itemId'] ?>'})" type="number" name="quantity" value="<?= $product['quantity'] ?>" autocomplete="false"></td>
                 <td>$<?php echo number_format($product['price'] * $product['quantity'], 2); ?></td>
             </tr>
         <?php endforeach; ?>
@@ -102,9 +141,9 @@ function removeProduct($data)
         </table>
     </div>
     <div class="total-price">
-        <a href="#" class="btn">Proceder al pago &#8594;
+        <button onclick="payInvoice" class="btn" pp-suspense="Pagando...">Proceder al pago &#8594;
             <span></span>
             <span></span>
-        </a>
+        </button>
     </div>
 </div>
