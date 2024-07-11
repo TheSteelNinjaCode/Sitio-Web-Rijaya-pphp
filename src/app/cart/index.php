@@ -21,7 +21,11 @@ $cartItems = $prisma->cart->findMany([
     'include' => [
         'items' => [
             'include' => [
-                'product' => true
+                'product' => [
+                    'include' => [
+                        'ProductImage' => true
+                    ]
+                ]
             ]
         ]
     ]
@@ -32,12 +36,7 @@ foreach ($cartItems as $cart) {
     if (isset($cart->items) && is_array($cart->items)) {
         foreach ($cart->items as $item) {
             $product = $item->product[0];
-            $productImage = $prisma->productImage->findFirst([
-                'where' => [
-                    'productId' => $item->productId
-                ]
-            ], true);
-            $products[] = array_merge((array)$product, ['quantity' => $item->quantity, 'itemId' => $item->id], ['image' => $productImage->image]);
+            $products[] = array_merge((array)$product, ['quantity' => $item->quantity, 'itemId' => $item->id], ['image' => $product->ProductImage[0]->image ?? '']);
         }
     }
 }

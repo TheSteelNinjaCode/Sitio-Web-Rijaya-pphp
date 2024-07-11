@@ -135,7 +135,7 @@ class UserRole implements IModel
                 continue;
             }
             $whereQuery = ['where' => [$foreignKey => $item[$primaryKey]]];
-            $mergeQuery = array_merge($whereQuery, $includeSelectedFields);
+            $mergeQuery = array_merge($whereQuery, $includeSelectedFields, ['fromInclude' => true]);
             $relatedRecords = $instanceModelName->findMany($mergeQuery, $format);
             $item[$relationName] = $relatedRecords;
         }
@@ -720,6 +720,11 @@ class UserRole implements IModel
             throw new \Exception("You can't use both 'include' and 'select' at the same time.");
         }
 
+        
+        $fromInclude = $criteria['fromInclude'] ?? false;
+        if ($fromInclude)
+            unset($criteria['fromInclude']);
+
         $acceptedCriteria = ['where', 'select', 'include'];
         Utility::checkForInvalidKeys($criteria, $acceptedCriteria, $this->_modelName);
 
@@ -798,8 +803,8 @@ class UserRole implements IModel
         }
 
         // Include related models as requested in the 'include' parameter
-        foreach ($includes as $relation => $include) {
-            if ($include) {
+        foreach ($includes as $relation => $relationInclude) {
+            if ($relationInclude) {
                 $relatedField = $relatedEntityFields[$relation] ?? [];
                 if ($relatedField && (is_string($relatedField) || is_int($relatedField))) {
                     $selectedFields = [$relatedField => true];
@@ -809,7 +814,17 @@ class UserRole implements IModel
 
                 $includeMethodName = "include" . ucfirst($relation);
                 if (method_exists($this, $includeMethodName)) {
-                    $record = $this->$includeMethodName($record, $select, $selectedFields, $format);
+                    $includeParams = [];
+                    if (!$fromInclude && !empty($include)) {
+                        $includeParams = $include[$relation];
+
+                        if (is_bool($includeParams)) {
+                            $includeParams = [];
+                        }
+                    } else {
+                        $includeParams = $selectedFields;
+                    }
+                    $record = $this->$includeMethodName($record, $select, $includeParams, $format);
                 } else {
                     throw new \Exception("The '$relation' does not exist, in the UserRole model.");
                 }
@@ -874,6 +889,10 @@ class UserRole implements IModel
         if (isset($criteria['include']) && isset($criteria['select'])) {
             throw new \Exception("You can't use both 'include' and 'select' at the same time.");
         }
+
+        $fromInclude = $criteria['fromInclude'] ?? false;
+        if ($fromInclude)
+            unset($criteria['fromInclude']);
 
         $acceptedCriteria = ['where', 'orderBy', 'take', 'skip', 'cursor', 'select', 'include', 'distinct'];
         Utility::checkForInvalidKeys($criteria, $acceptedCriteria, $this->_modelName);
@@ -962,8 +981,8 @@ class UserRole implements IModel
             }
         }
 
-        foreach ($includes as $relation => $include) {
-            if ($include) {
+        foreach ($includes as $relation => $relationInclude) {
+            if ($relationInclude) {
                 $relatedField = $relatedEntityFields[$relation] ?? [];
                 if ($relatedField && (is_string($relatedField) || is_int($relatedField))) {
                     $selectedFields = [$relatedField => true];
@@ -973,7 +992,17 @@ class UserRole implements IModel
                 
                 $includeMethodName = "include" . ucfirst($relation);
                 if (method_exists($this, $includeMethodName)) {
-                    $items = $this->$includeMethodName($items, $select, $selectedFields, $format);
+                    $includeParams = [];
+                    if (!$fromInclude && !empty($include)) {
+                        $includeParams = $include[$relation];
+
+                        if (is_bool($includeParams)) {
+                            $includeParams = [];
+                        }
+                    } else {
+                        $includeParams = $selectedFields;
+                    }
+                    $items = $this->$includeMethodName($items, $select, $includeParams, $format);
                 } else {
                     throw new \Exception("The '$relation' does not exist, in the UserRole model.");
                 }
@@ -1054,6 +1083,10 @@ class UserRole implements IModel
         if (isset($criteria['include']) && isset($criteria['select'])) {
             throw new \Exception("You can't use both 'include' and 'select' at the same time.");
         }
+
+        $fromInclude = $criteria['fromInclude'] ?? false;
+        if ($fromInclude)
+            unset($criteria['fromInclude']);
 
         $acceptedCriteria = ['where', 'orderBy', 'take', 'skip', 'cursor', 'select', 'include', 'distinct'];
         Utility::checkForInvalidKeys($criteria, $acceptedCriteria, $this->_modelName);
@@ -1144,8 +1177,8 @@ class UserRole implements IModel
             }
         }
 
-        foreach ($includes as $relation => $include) {
-            if ($include) {
+        foreach ($includes as $relation => $relationInclude) {
+            if ($relationInclude) {
                 $relatedField = $relatedEntityFields[$relation] ?? [];
                 if ($relatedField && (is_string($relatedField) || is_int($relatedField))) {
                     $selectedFields = [$relatedField => true];
@@ -1155,7 +1188,17 @@ class UserRole implements IModel
                 
                 $includeMethodName = "include" . ucfirst($relation);
                 if (method_exists($this, $includeMethodName)) {
-                    $record = $this->$includeMethodName($record, $select, $selectedFields, $format);
+                    $includeParams = [];
+                    if (!$fromInclude && !empty($include)) {
+                        $includeParams = $include[$relation];
+
+                        if (is_bool($includeParams)) {
+                            $includeParams = [];
+                        }
+                    } else {
+                        $includeParams = $selectedFields;
+                    }
+                    $record = $this->$includeMethodName($record, $select, $includeParams, $format);
                 } else {
                     throw new \Exception("The '$relation' does not exist, in the UserRole model.");
                 }
