@@ -62,7 +62,8 @@ function updateQuantity($data)
 {
     global $prisma;
 
-    if (!Validator::int($data->quantity))
+    $quantity = $data->quantity;
+    if (!Validator::int($quantity))
         return 'La cantidad debe ser un número entero';
 
     $prisma->cartItem->update([
@@ -70,7 +71,7 @@ function updateQuantity($data)
             'id' => $data->itemId,
         ],
         'data' => [
-            'quantity' => $data->quantity,
+            'quantity' => $quantity,
         ]
     ]);
 }
@@ -85,6 +86,8 @@ function payInvoice()
             'payed' => false
         ]
     ], true);
+
+    if (!$cart) return 'No hay carrito para pagar';
 
     $prisma->cart->update([
         'where' => [
